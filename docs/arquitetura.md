@@ -91,7 +91,3 @@ Dois serviços definidos em `render.yaml`:
 
 1. **api** — Python Web Service: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 2. **web** — Static Site: build do Vite (`npm run build`) servindo `frontend/dist`
-
-⚠️ **Free tier dorme após inatividade** → cold start de ~30s. Manter "acordado" perto do
-Demo Day. Variáveis sensíveis (chave de IA) só via painel de Environment do Render, **nunca**
-no repositório.
