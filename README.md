@@ -101,12 +101,12 @@ Veja detalhes em `docs/arquitetura.md`
 
 | Nome | Perfil | GitHub |
 |------|--------|--------|
-| [Nome] | [Perfil] | [@usuario] |
-| [Nome] | [Perfil] | [@usuario] |
-| [Nome] | [Perfil] | [@usuario] |
-| [Nome] | [Perfil] | [@usuario] |
-| [Nome] | [Perfil] | [@usuario] |
-| [Nome] | [Perfil] | [@usuario] |
+| Isabel Ekeminiobong Guimarães Ukoeninn | Cybersecurity Engineer | [@bebelkmn](https://github.com/bebelkmn) |
+| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
+| Leonardo Behnck | Mobile Developer | [@leonardobehnck](https://github.com/leonardobehnck) |
+| Luiz Eduardo Raposo | Fullstack Developer | [@luizeduardoraposo](https://github.com/luizeduardoraposo) |
+| Noelia Daiana Limp Arriola | UX/UI Designer | [@noeliaarriola](https://github.com/noeliaarriola) |
+| Thayssa Neves | Backend Developer | [@RodaThay](https://github.com/RodaThay) |
 
 ---
 
