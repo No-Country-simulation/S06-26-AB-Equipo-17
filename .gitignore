@@ -1,0 +1,54 @@
+﻿# ─── CREDENCIAIS E VARIÁVEIS DE AMBIENTE ────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+
+
+# ─── DEPENDÊNCIAS ────────────────────────────────────────────
+node_modules/
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+venv/
+env/
+
+
+# ─── BUILD E DIST ────────────────────────────────────────────
+dist/
+build/
+.next/
+out/
+*.egg-info/
+
+
+# ─── BANCO DE DADOS ──────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+
+
+# ─── LOGS ────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+
+
+# ─── SISTEMA OPERACIONAL ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+
+# ─── EDITORES ────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+
+
+# ─── DATASET LOCAL (use o do repositório oficial) ────────────
+dataset/*.csv
+dataset/*.json
+!dataset/README.md
