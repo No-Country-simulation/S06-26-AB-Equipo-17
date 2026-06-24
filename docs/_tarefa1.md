@@ -37,8 +37,8 @@ decisões — hoje isso leva dias cruzando planilhas manualmente.
 | Frontend | **React + Vite + TypeScript** (PWA via `vite-plugin-pwa`) | Popular, empregável, muito material |
 | Mapa | **Leaflet + OpenStreetMap** | Gratuito, sem chave de API |
 | Backend | **Python 3.11+ + FastAPI + Pydantic** | pandas facilita o pipeline; docs automáticas |
-| Dados | **pandas** (Parquet/CSV em memória) | Read-only, poucos milhares de linhas |
-| IA | **Provider-agnostic** (A definir) |  |
+| Dados | **pandas** (DataFrame em memória) | Read-only; poucos milhares de linhas |
+| IA | **Provider-agnostic** (Gemini API) |
 | PDF | **react-to-print** | Exporta o "paper" |
 | Deploy | **Render** (site estático + web service) | Free tier, monorepo via `render.yaml` |
 
@@ -56,20 +56,22 @@ número). A camada de IA é trocável por variável de ambiente.
 
 ## 📊 Dataset Vísent CDRView
 
-Concentração de pessoas por zona × cobertura de rede (ERBs reais da Claro/Anatel) na **Região
-Metropolitana de Florianópolis**. Usamos as **tabelas agregadas (~3 MB)** — `antenas_flp.csv`
-(132 antenas), `tensor_concentracao.csv` (7.920 linhas), `tensor_od.csv`. Os tensores crus
-(2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do repo). Indicadores sociais
-(emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
+Dados de mobilidade da rede móvel na **Região Metropolitana de Florianópolis** — 132 ERBs reais
+da Claro/Anatel, 27 clusters, 7 municípios, 200 mil assinantes, 15 dias. Usamos as **tabelas
+agregadas** (do `bases_hackathon_bit.zip`, ~3 MB compactado): `tensor_concentracao.csv`
+(7.920 linhas — concentração + qualidade de rede + lat/lon) e `assinantes.csv` (~10 MB, **faixa de
+renda real**, dimensão de desigualdade); `antenas_flp.csv` (132) é opcional. O pipeline reduz tudo
+a um Parquet de poucos KB. Os tensores crus (2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do
+repo). Indicadores sociais (emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
 
 **Pipeline (ETL):** Extract (zip 3 MB) → Profiling → Transform (limpeza + cruzamento
-concentração × cobertura) → Validate → Load (Parquet em memória). Preparado para receber
+concentração × qualidade de rede × renda) → Validate → Load (Parquet). Preparado para receber
 mais fontes (IBGE, DATASUS) sem refatorar.
 
 ## 🚀 Deploy
 
 Monorepo no **Render** com `render.yaml`: 1 **site estático** (frontend, grátis e sem dormir)
-+ 1 **web service** (backend FastAPI, free tier 750h/mês). Cabe no plano free.
++ 1 **web service** (backend FastAPI, free tier 750h/mês).
 
 ## 👥 Equipe e frentes (6 pessoas)
 
@@ -87,8 +89,7 @@ Monorepo no **Render** com `render.yaml`: 1 **site estático** (frontend, gráti
 ```
 appbit-17/
 ├── docs/        ← documentação técnica (arquitetura, contrato, pipeline, deploy…)
-├── dataset/     ← CSVs agregados do Vísent (grandes ficam no .gitignore)
-├── backend/     ← API Python/FastAPI + pipeline de dados
+├── backend/     ← API FastAPI + pipeline + dataset/ (CSVs agregados + Parquet)
 ├── frontend/    ← React + Vite (PWA)
 └── render.yaml  ← deploy dos 2 serviços
 ```
