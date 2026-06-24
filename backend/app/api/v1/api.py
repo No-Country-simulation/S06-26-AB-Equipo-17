@@ -1,9 +1,11 @@
-"""Router mestre da v1 — junta todos os endpoints (montados sob /api/v1)."""
+"""Router mestre da v1 (montado sob /api/v1).
+
+Por enquanto só `/health`. Os endpoints `/dados` e `/mapa` serão adicionados pela
+frente de Backend/API (outra pessoa do time).
+"""
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import dados, health, mapa
+from app.api.v1.endpoints import health
 
 api_router = APIRouter()
 api_router.include_router(health.router)
-api_router.include_router(dados.router)
-api_router.include_router(mapa.router)
