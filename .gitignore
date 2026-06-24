@@ -52,3 +52,7 @@ Thumbs.db
 dataset/*.csv
 dataset/*.json
 !dataset/README.md
+
+
+# ─── MEMÓRIA DA SESSÃO (não commitar) ────────────────────────
+skills/
