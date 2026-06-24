@@ -55,4 +55,7 @@ dataset/*.json
 
 
 # ─── MEMÓRIA DA SESSÃO (não commitar) ────────────────────────
-skills/
+skills/venv/
+__pycache__/
+*.pyc
+.env
