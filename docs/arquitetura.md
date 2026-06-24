@@ -8,17 +8,17 @@
 │   React + Vite + TS   │                    │      Python + FastAPI     │
 │                       │  ◀───────────────  │                           │
 │  • ConsultaPage (IA)  │   resposta "paper" │  ┌──────────────────────┐ │
-│  • MapaPage (Leaflet) │                    │  │  ai.service          │ │
+│  • MapaPage (Leaflet) │                    │  │  ai_service          │ │
 │  • Export PDF         │                    │  │   ├─ MockProvider    │ │
-└──────────────────────┘                    │  │   └─ ClaudeProvider  │ │
+└──────────────────────┘                    │  │   └─ GeminiProvider  │ │
                                              │  └──────────┬───────────┘ │
                                              │  ┌──────────▼───────────┐ │
-                                             │  │  data.service        │ │
-                                             │  │  (pandas em memória) │ │
+                                             │  │  data_service        │ │
+                                             │  │  (pandas + Parquet)  │ │
                                              │  └──────────┬───────────┘ │
                                              └─────────────┼─────────────┘
                                                            ▼
-                                            dataset/ (CSVs agregados Vísent)
+                                  backend/dataset/ (Parquet + CSVs agregados)
 ```
 
 **Princípio central:** o frontend nunca fala com a IA diretamente. Ele chama a API; a API
@@ -32,29 +32,29 @@ filtra os dados reais e só então pede à IA que **redija** a resposta usando *
 | Mapa | **Leaflet + OpenStreetMap** | Gratuito, **sem chave de API** |
 | Backend | **Python 3.11+ + FastAPI** | Docs automáticas em `/docs`; async |
 | Validação | **Pydantic v2** | Garante o formato do "paper" na entrada e saída |
-| Dados | **pandas** (CSVs em memória) | Carrega no startup; poucos milhares de linhas |
-| IA | **Provider-agnostic** | `MockProvider` (default) → `ClaudeProvider` (real) |
+| Dados | **pandas** (DataFrame em memória) | Carrega no startup; ~8 mil linhas; só leitura |
+| IA | **Provider-agnostic** | `MockProvider` (default) → `GeminiProvider` (real) |
 | PDF | **react-to-print** (frontend) | Exporta o card de resultado |
 | Deploy | **Render** (2 serviços) | `web` (frontend estático) + `api` (uvicorn) |
 
 ## Por que os dados ficam em memória (e não num banco)
 
 Os arquivos úteis do Vísent são **read-only** e têm poucos milhares de linhas (ver
-[dados-visent.md](./dados-visent.md)). Carregar com pandas no startup:
+[dados-visent.md](./dados-visent.md)). Carregar com **pandas** (DataFrame) no startup:
 
 - ✅ **Zero fricção no Dia 1** — ninguém trava instalando/configurando Postgres
 - ✅ Deploy instantâneo no Render
-- ✅ Consultas em memória são rápidas
+- ✅ Consultas em memória com pandas, sem servidor de banco
 
-A camada `data.service` isola o acesso aos dados. Migrar para **Postgres** no futuro mexe
+A camada `data_service` isola o acesso aos dados. Migrar para **Postgres** no futuro mexe
 em **um arquivo só**, sem afetar rotas nem frontend. (O desafio pede arquitetura
 "preparada para mais fontes" — isso é atendido pela abstração, não por um banco no MVP.)
 
 ## Fontes de dados plugáveis
 
 ```
-data.service
-   ├─ VisentSource      (núcleo, dado real — concentração × cobertura)
+data_service
+   ├─ VisentSource      (núcleo, dado real — concentração × qualidade de rede × renda)
    ├─ SocialSource      (emprego/formação/saúde mental — mock por município no MVP)
    └─ [futuro] IBGE / DATASUS / IPEA / Brasil.io
 ```
@@ -67,16 +67,16 @@ Cada fonte implementa a mesma interface, então adicionar IBGE/DATASUS depois n�
 appbit-17/
 ├── docs/                      ← você está aqui
 ├── shared/                    ← contrato (referência; tipos espelhados em TS e Pydantic)
-├── dataset/                   ← CSVs pequenos do Vísent (grandes ficam no .gitignore)
 ├── backend/
 │   ├── requirements.txt
+│   ├── dataset/               ← CSVs agregados + processed/*.parquet (GB no .gitignore)
 │   ├── app/
 │   │   ├── main.py            ← FastAPI app + rotas
 │   │   ├── models.py          ← schemas Pydantic (contrato)
 │   │   ├── routers/           ← dados.py, mapa.py, health.py
-│   │   ├── services/          ← ai_service.py, data_service.py
+│   │   ├── services/          ← ai_service.py, data_service.py (pandas)
 │   │   └── data/              ← loader.py + fontes plugáveis
-│   └── scripts/ingest.py      ← pipeline: CSV → estruturas em memória
+│   └── scripts/ingest.py      ← pipeline: CSV → Parquet
 ├── frontend/
 │   └── src/
 │       ├── pages/             ← ConsultaPage, MapaPage
