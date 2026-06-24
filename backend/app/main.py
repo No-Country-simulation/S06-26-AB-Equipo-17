@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1.api import api_router
-from app.api.v1.endpoints import health
 
 
 def create_app() -> FastAPI:
@@ -17,8 +16,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(health.router)                 # /health (sem versão — usado no healthcheck)
-    app.include_router(api_router, prefix="/api/v1")  # /api/v1/dados, /api/v1/mapa
+    app.include_router(api_router, prefix="/api/v1")  # /api/v1/health, /api/v1/dados, /api/v1/mapa
     return app
 
 

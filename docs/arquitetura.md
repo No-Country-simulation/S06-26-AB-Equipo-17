@@ -95,7 +95,7 @@ appbit-17/
 ### Camadas do backend (fluxo de uma requisição)
 
 ```
-POST /dados → endpoint → data_service.buscar() → ai_service.responder()
+POST /api/v1/dados → endpoint → data_service.buscar() → ai_service.responder()
                                                     ├ monta o prompt (ancorado)
                                                     └ ai_gateway.gerar() → Mock | Gemini
                                                   → valida no RespostaPaper → JSON

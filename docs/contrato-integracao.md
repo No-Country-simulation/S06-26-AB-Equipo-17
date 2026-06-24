@@ -7,9 +7,12 @@
 
 Base URL local: `http://localhost:8000`
 
+> **Todos** os endpoints ficam sob **`/api/v1`** (`/api/v1/health`, `/api/v1/dados`, `/api/v1/mapa`).
+> O `healthCheckPath` do Render aponta para `/api/v1/health`.
+
 ---
 
-## `GET /health`
+## `GET /api/v1/health`
 
 Verifica se a API está no ar.
 
@@ -20,7 +23,7 @@ Verifica se a API está no ar.
 
 ---
 
-## `POST /dados`
+## `POST /api/v1/dados`
 
 Consulta em linguagem natural. Retorna a resposta no formato **"mini-paper"**.
 
@@ -94,7 +97,7 @@ O brief pede `{ resposta_ia, dados, fontes }`. Nosso formato é uma **extensão*
 
 ---
 
-## `GET /mapa`
+## `GET /api/v1/mapa`
 
 Dados georreferenciados para renderizar o mapa.
 
