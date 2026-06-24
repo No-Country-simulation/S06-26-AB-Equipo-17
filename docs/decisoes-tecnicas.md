@@ -162,7 +162,7 @@ por sessão — não nas tabelas pequenas. O `tensor_concentracao` traz proxies 
 **Contexto:** o ADR-006 deixou o provedor em aberto (camada provider-agnostic). A equipe escolheu.
 
 **Decisão:** o provedor real é o **Google Gemini** (API), via SDK Python **`google-genai`**.
-Modelo: um **Flash** (rápido/barato), ex. `gemini-2.5-flash` (confirmar versão na doc oficial).
+Modelo: um **Flash** (rápido/barato), ex. `gemini-3.5-flash` (confirmar versão na doc oficial).
 Ativado por `AI_PROVIDER=gemini` + `AI_API_KEY`; o `MockProvider` segue como default até a chave existir.
 
 **Motivos:** tier gratuito generoso, boa saída estruturada (response schema JSON), SDK simples.

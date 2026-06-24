@@ -60,7 +60,7 @@ Trocar para IA real = definir `AI_PROVIDER=gemini` + `AI_API_KEY=...` no `.env`.
 ## Provedor escolhido: Google Gemini
 
 O provedor é o **Google Gemini** (API). SDK Python: **`google-genai`** (`from google import genai`).
-Modelo sugerido: um **Flash** (rápido/barato), ex. `gemini-2.5-flash` — confirmar a versão atual
+Modelo sugerido: um **Flash** (rápido/barato), ex. `gemini-3.5-flash` — confirmar a versão atual
 na documentação oficial do Gemini antes de codar.
 
 **Regras:**

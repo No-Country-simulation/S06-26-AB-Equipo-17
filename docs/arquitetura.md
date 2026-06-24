@@ -8,9 +8,9 @@
 │   React + Vite + TS   │                    │      Python + FastAPI     │
 │                       │  ◀───────────────  │                           │
 │  • ConsultaPage (IA)  │   resposta "paper" │  ┌──────────────────────┐ │
-│  • MapaPage (Leaflet) │                    │  │  ai_service          │ │
-│  • Export PDF         │                    │  │   ├─ MockProvider    │ │
-└──────────────────────┘                    │  │   └─ GeminiProvider  │ │
+│  • MapaPage (Leaflet) │                    │  │  ai_service (prompt) │ │
+│  • Export PDF         │                    │  │   → ai_gateway       │ │
+└──────────────────────┘                    │  │     (Mock | Gemini)  │ │
                                              │  └──────────┬───────────┘ │
                                              │  ┌──────────▼───────────┐ │
                                              │  │  data_service        │ │
@@ -33,7 +33,7 @@ filtra os dados reais e só então pede à IA que **redija** a resposta usando *
 | Backend | **Python 3.11+ + FastAPI** | Docs automáticas em `/docs`; async |
 | Validação | **Pydantic v2** | Garante o formato do "paper" na entrada e saída |
 | Dados | **pandas** (DataFrame em memória) | Carrega no startup; ~8 mil linhas; só leitura |
-| IA | **Provider-agnostic** | `MockProvider` (default) → `GeminiProvider` (real) |
+| IA | **ai_service + ai_gateway** | service monta prompt; gateway plugável: `MockGateway` → `GeminiGateway` |
 | PDF | **react-to-print** (frontend) | Exporta o card de resultado |
 | Deploy | **Render** (2 serviços) | `web` (frontend estático) + `api` (uvicorn) |
 
@@ -69,14 +69,21 @@ appbit-17/
 ├── shared/                    ← contrato (referência; tipos espelhados em TS e Pydantic)
 ├── backend/
 │   ├── requirements.txt
+│   ├── .env.example
 │   ├── dataset/               ← CSVs agregados + processed/*.parquet (GB no .gitignore)
-│   ├── app/
-│   │   ├── main.py            ← FastAPI app + rotas
-│   │   ├── models.py          ← schemas Pydantic (contrato)
-│   │   ├── routers/           ← dados.py, mapa.py, health.py
-│   │   ├── services/          ← ai_service.py, data_service.py (pandas)
-│   │   └── data/              ← loader.py + fontes plugáveis
-│   └── scripts/ingest.py      ← pipeline: CSV → Parquet
+│   ├── scripts/ingest.py      ← pipeline ETL (CSV → Parquet)  [a criar]
+│   ├── tests/                 ← smoke tests
+│   └── app/
+│       ├── main.py            ← create_app(): CORS + router
+│       ├── api/
+│       │   ├── deps.py        ← injeção (get_ai_service)
+│       │   └── v1/
+│       │       ├── api.py     ← router mestre
+│       │       └── endpoints/ ← health.py · dados.py · mapa.py
+│       ├── core/config.py     ← settings (Pydantic Settings)
+│       ├── schemas/dados.py   ← DTOs Pydantic (contrato)
+│       ├── services/          ← data_service.py (pandas) · ai_service.py (prompt)
+│       └── gateways/          ← ai_gateway (Protocol) · gemini_gateway · mock_gateway
 ├── frontend/
 │   └── src/
 │       ├── pages/             ← ConsultaPage, MapaPage
@@ -84,6 +91,20 @@ appbit-17/
 │       └── api/client.ts
 └── render.yaml
 ```
+
+### Camadas do backend (fluxo de uma requisição)
+
+```
+POST /dados → endpoint → data_service.buscar() → ai_service.responder()
+                                                    ├ monta o prompt (ancorado)
+                                                    └ ai_gateway.gerar() → Mock | Gemini
+                                                  → valida no RespostaPaper → JSON
+```
+
+- **endpoint** (`api/v1/endpoints`): só traduz HTTP ↔ chamada de serviço (fino).
+- **services**: `data_service` (filtra com pandas) e `ai_service` (monta prompt + valida).
+- **gateways**: a IA é um **adapter externo** — recebe `prompt + schema`, devolve JSON.
+  Trocar Mock↔Gemini (ou plugar outro LLM) mexe **só aqui**.
 
 ## Deploy (Render)
 
