@@ -167,3 +167,24 @@ Ativado por `AI_PROVIDER=gemini` + `AI_API_KEY`; o `MockProvider` segue como def
 
 **Motivos:** tier gratuito generoso, boa saída estruturada (response schema JSON), SDK simples.
 A abstração do ADR-006 mantém o Mock como fallback e isola o `GeminiProvider` num arquivo.
+
+---
+
+## ADR-012 — UI: design system à mão + shadcn/ui (híbrido)
+**Data:** 2026-06-24 · **Status:** Aceito
+
+**Contexto:** existe um **design system completo** (cores/fontes/componentes). O shadcn/ui é
+copy-in (Radix + Tailwind), não uma lib instalada — você é dono do código.
+
+**Decisão:** abordagem **híbrida**:
+- Componentes simples/visuais do DS (IconButton, Card, botões, o "paper") → **à mão** com Tailwind.
+- Interativos complexos (Select de filtros, Command/combobox de sugestões, Dialog, Toast, Tooltip)
+  → **shadcn/ui** (Radix).
+- Os tokens do shadcn (`--primary`, `--radius`, `--ring`…) são **mapeados** aos do tema
+  (`--color-brand-*`, `--radius-card`) pra herdar a identidade visual.
+
+**Motivos:** acessibilidade/comportamento (teclado, ARIA, foco) dos componentes complexos é cara
+e arriscada de fazer à mão — Radix entrega pronto; o visual continua sendo o do DS.
+
+**Trade-off:** setup inicial pra reconciliar tokens shadcn ↔ DS. Confirmar o caminho de install
+do shadcn pro **Tailwind v4**.
