@@ -1,0 +1,14 @@
+/* ============================================================
+   RADIUS — App BiT (Equipo 17)
+   Tailwind v4: cada token vira utilitário (rounded-badge … rounded-pill).
+   Valores do print do DS (2026-06-25).
+   ============================================================ */
+
+@theme {
+  --radius-badge: 1rem;     /* 16px */
+  --radius-btn-sm: 0.75rem; /* 12px */
+  --radius-card: 1.25rem;   /* 20px */
+  --radius-input: 1.5rem;   /* 24px */
+  --radius-panel: 1.75rem;  /* 28px */
+  --radius-pill: 9999px;    /* totalmente arredondado */
+}
