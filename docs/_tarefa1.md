@@ -38,7 +38,7 @@ decisões — hoje isso leva dias cruzando planilhas manualmente.
 | Mapa | **Leaflet + OpenStreetMap** | Gratuito, sem chave de API |
 | Backend | **Python 3.11+ + FastAPI + Pydantic** | pandas facilita o pipeline; docs automáticas |
 | Dados | **pandas** (DataFrame em memória) | Read-only; poucos milhares de linhas |
-| IA | **Provider-agnostic** → **Gemini API** | `MockProvider` por padrão; troca pra Gemini por env |
+| IA | **Provider-agnostic** (Gemini API) |
 | PDF | **react-to-print** | Exporta o "paper" |
 | Deploy | **Render** (site estático + web service) | Free tier, monorepo via `render.yaml` |
 
@@ -99,7 +99,7 @@ appbit-17/
 ## 🔗 Links
 
 ### Projeto
-- **Repositório do time:** [github.com/No-Country-simulation/appbit-17](https://github.com/No-Country-simulation/appbit-17)
+- **Repositório do time:** [github.com/No-Country-simulation/S06-26-AB-Equipo-17](https://github.com/No-Country-simulation/S06-26-AB-Equipo-17)
 - **Documentação técnica:** pasta [`/docs`](./README.md) — arquitetura, decisões,
   contrato de API, pipeline de dados, deploy e divisão de tarefas
 
