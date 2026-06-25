@@ -5,15 +5,12 @@
 @import "tailwindcss";
 @import "./colors.css";
 @import "./fonts.css";
+@import "./shadows.css";
+@import "./radius.css";
 
-/* ---- Tokens diversos (raio, etc.) — TODO ajustar ---- */
-@theme {
-  --radius-card: 0.75rem; /* vira rounded-card */
-}
-
-/* ---- Base global — TODO ajustar conforme o tema ---- */
+/* ---- Base global ---- */
 body {
-  background-color: var(--color-surface-muted);
+  background-color: var(--color-app);
   color: var(--color-ink);
   font-family: var(--font-sans);
 }

@@ -1,36 +1,39 @@
 /* ============================================================
    CORES — App BiT (Equipo 17)
-   Tailwind v4: cada token vira utilitário automaticamente
-   (bg-brand-500 · text-ink-muted · ring-brand-500 · border-line).
-   👉 ESQUELETO: ajuste os valores marcados com TODO.
+   Espelha o design system. Tailwind v4: cada token vira
+   utilitário automaticamente (bg-primary · text-ink · bg-region-1).
+   Hex aproximados do print do DS (2026-06-25).
    ============================================================ */
 
 @theme {
-  /* ---- MARCA (ação principal / estado ativo) — TODO ajustar ---- */
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-400: #60a5fa;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-900: #1e3a8a;
+  /* ---- SEMÂNTICAS ---- */
+  --color-primary: #2f6bff;       /* primary       */
+  --color-primary-soft: #dce7fb;  /* primary-soft  */
+  --color-success: #41be5b;       /* success       */
+  --color-success-soft: #d8f0dd;  /* success-soft  */
+  --color-critical: #ee4732;      /* critical      */
+  --color-critical-soft: #fbe1dd; /* derivado — par soft do critical (não está no DS) */
+  --color-warning: #f4c430;       /* warning       */
 
-  /* ---- ACENTO (destaque secundário) — TODO definir ---- */
-  --color-accent-400: #c084fc; /* TODO */
-  --color-accent-600: #9333ea; /* TODO */
+  /* ---- SUPERFÍCIES ---- */
+  --color-surface: #ffffff;       /* surface (cards)        */
+  --color-surface-sec: #f6f7f9;   /* surface-sec            */
+  --color-app: #ececf1;           /* bg/app (fundo da página) */
 
-  /* ---- SEMÂNTICAS (níveis de confiança do "paper") — TODO ajustar ---- */
-  --color-confianca-alta: #16a34a;  /* verde    */
-  --color-confianca-media: #d97706;  /* âmbar    */
-  --color-confianca-baixa: #dc2626;  /* vermelho */
+  /* ---- TEXTO (utilitários text-ink, text-ink-muted, ...) ---- */
+  --color-ink: #16171b;           /* text/primary   */
+  --color-ink-muted: #6e7178;     /* text/secondary */
+  --color-ink-blue: #2f6bff;      /* text/blue      */
+  --color-ink-inverse: #ffffff;   /* text/inverse   */
 
-  /* ---- SUPERFÍCIE / TEXTO / LINHAS — TODO ajustar ---- */
-  --color-surface: #ffffff;        /* fundo de cards            */
-  --color-surface-muted: #f8fafc;  /* fundo da página           */
-  --color-ink: #0f172a;            /* texto principal           */
-  --color-ink-muted: #64748b;      /* texto secundário/legendas */
-  --color-line: #e2e8f0;           /* bordas/divisores          */
+  /* ---- LINHAS / BORDAS (derivado, não está no DS) ---- */
+  --color-line: #e6e7ec;
+
+  /* ---- REGIÕES (mapa / chips de região) ---- */
+  --color-region-1: #dce8dd;
+  --color-region-2: #e0d6e7;
+  --color-region-3: #ecd4c7;
+  --color-region-4: #d6dce6;
+  --color-region-5: #efe5c7;
+  --color-region-6: #d1e0da;
 }
