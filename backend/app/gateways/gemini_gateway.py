@@ -1,7 +1,10 @@
-"""Gateway real — Google Gemini (Interactions API, SDK google-genai).
+"""Gateway real — Google Gemini (SDK google-genai, models.generate_content).
 
-Ref.: https://ai.google.dev/gemini-api/docs
+Saída estruturada via `response_schema` (modelo Pydantic) + `response_mime_type=json`.
+Ref.: https://ai.google.dev/gemini-api/docs/structured-output
 """
+from pydantic import BaseModel
+
 from app.core.config import settings
 
 
@@ -10,14 +13,16 @@ class GeminiGateway:
         from google import genai  # import lazy (só quando o gateway é usado)
         self._client = genai.Client(api_key=settings.ai_api_key)
 
-    def gerar(self, prompt: str, schema: dict) -> str:
-        interaction = self._client.interactions.create(
+    def gerar(self, prompt: str, *, system: str | None = None,
+              response_schema: type[BaseModel]) -> str:
+        resp = self._client.models.generate_content(
             model=settings.ai_model,
-            input=prompt,
-            response_format={
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": schema,
+            contents=prompt,
+            config={
+                "system_instruction": system,
+                "response_mime_type": "application/json",
+                "response_schema": response_schema,  # o SDK converte o Pydantic (inclusive aninhado)
+                "temperature": 0.2,
             },
         )
-        return interaction.output_text
+        return resp.text

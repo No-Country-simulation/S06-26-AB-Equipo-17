@@ -29,9 +29,16 @@ class Fonte(BaseModel):
     tipo: str = "dataset"          # dataset | publica | enriquecida
 
 
+class PontoMapa(BaseModel):
+    regiao: str
+    lat: float | None = None
+    lng: float | None = None
+    valor: float | None = None
+
+
 class Visualizacao(BaseModel):
     tipo: str = "nenhuma"          # mapa | barra | nenhuma
-    dados: list[dict] = Field(default_factory=list)
+    dados: list[PontoMapa] = Field(default_factory=list)
 
 
 class RespostaPaper(BaseModel):

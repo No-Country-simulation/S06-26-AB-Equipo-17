@@ -11,37 +11,46 @@ reais filtradas do dataset e é instruído a responder usando *somente* essas li
 ## Fluxo (padrão "ancorado" / grounded)
 
 ```
-1. Usuário pergunta  ─▶  POST /dados
+1. Usuário pergunta  ─▶  POST /api/v1/dados
 2. data_service filtra as linhas relevantes do Vísent (por região/indicador)
-3. ai_service monta o contexto: pergunta + linhas filtradas + idioma
-4. Provider (Mock ou Gemini) redige a resposta CITANDO só os dados recebidos
-5. Pydantic valida o JSON do "paper"  ─▶  resposta ao frontend
+3. ai_service monta o contexto (linhas + pergunta) e as instruções (system)
+4. ai_gateway chama o Gemini → JSON do "paper" (response_schema força o formato)
+5. ai_service valida no RespostaPaper (Pydantic)  ─▶  resposta ao frontend
 ```
 
 Por que ancorar? Porque é uma **ferramenta de decisão pública** — uma resposta com número
 inventado é pior do que nenhuma resposta.
 
-## Camada provider-agnostic
+## Camadas: service + gateway (sem mock)
+
+A lógica (montar prompt + validar) fica no **`ai_service`**; a chamada externa fica no
+**`ai_gateway`** (adapter). **Não há mock** — é Gemini direto.
 
 ```python
-# app/services/ai_service.py  (esboço conceitual)
+# app/services/ai_service.py — monta prompt + valida (NÃO chama a API)
+class AIService:
+    def responder(self, consulta, dados, idioma="pt") -> RespostaPaper:
+        system = _SYSTEM.format(idioma=idioma)
+        contexto = self.montar_contexto(consulta, dados)   # DADOS_JSON + PERGUNTA
+        try:
+            bruto = self._gateway.gerar(contexto, system=system, response_schema=RespostaPaper)
+            return RespostaPaper.model_validate_json(bruto)
+        except Exception:           # IA falhou/voltou inválido → fallback (sem 500)
+            return RespostaPaper(afirmacao="IA indisponível…", nivel_confianca="baixa")
 
-class AIProvider(Protocol):
-    def responder(self, consulta: str, dados: list[dict], idioma: str) -> RespostaPaper: ...
-
-class MockProvider:   # default — sem chave, resposta realista
-    ...
-
-class GeminiProvider: # real — plugado por variável de ambiente (SDK google-genai)
-    ...
-
-def get_provider() -> AIProvider:
-    if os.getenv("AI_PROVIDER") == "gemini" and os.getenv("AI_API_KEY"):
-        return GeminiProvider()
-    return MockProvider()
+# app/gateways/gemini_gateway.py — adapter externo (Gemini)
+class GeminiGateway:
+    def gerar(self, prompt, *, system, response_schema) -> str:
+        resp = self._client.models.generate_content(
+            model=settings.ai_model, contents=prompt,
+            config={"system_instruction": system,
+                    "response_mime_type": "application/json",
+                    "response_schema": response_schema, "temperature": 0.2})
+        return resp.text
 ```
 
-Trocar para IA real = definir `AI_PROVIDER=gemini` + `AI_API_KEY=...` no `.env`. **Nada mais muda.**
+`get_ai_gateway()` devolve o `GeminiGateway` (erro claro se faltar `AI_API_KEY`). Plugar a IA
+= setar `AI_API_KEY` no `.env`/painel do Render. **Nada mais muda.**
 
 ## Desafios de subir o agente (e mitigação)
 
@@ -57,14 +66,21 @@ Trocar para IA real = definir `AI_PROVIDER=gemini` + `AI_API_KEY=...` no `.env`.
 | 🔁 **Rate limit / falha** | Provedor cai no Demo Day ao vivo | Retry com backoff + timeout + fallback "tente novamente"; nunca travar a tela |
 | 🧪 **Prompt injection** | Usuário tenta burlar instruções via texto | Tratar a pergunta como dado, não como instrução; separar contexto de sistema |
 
-## Provedor escolhido: Google Gemini
+## Provedor: Google Gemini (implementação)
 
-O provedor é o **Google Gemini** (API). SDK Python: **`google-genai`** (`from google import genai`).
-Modelo sugerido: um **Flash** (rápido/barato), ex. `gemini-3.5-flash` — confirmar a versão atual
-na documentação oficial do Gemini antes de codar.
+SDK Python **`google-genai`** (`from google import genai`). Modelo `gemini-3.5-flash`.
+
+**Chamada correta:** `client.models.generate_content(model, contents, config)` — **NÃO**
+`client.interactions.create(...)` (no SDK 2.x esse método não aceita `model/input/response_format`
+como kwargs → `TypeError`).
+
+**Saída estruturada:** `config.response_mime_type="application/json"` +
+`config.response_schema=RespostaPaper` (passa o **modelo Pydantic**, não o `model_json_schema()` —
+o SDK converte, inclusive aninhado/Optional). Ler `resp.text` e validar com Pydantic.
 
 **Regras:**
-- A chave (`AI_API_KEY`) vive **só** no backend, via variável de ambiente, **nunca** versionada.
-- A integração fica **isolada** no `GeminiProvider` (um arquivo).
-- O `MockProvider` continua como **default** (até a chave existir) e como fallback demonstrável.
-- Pedir **saída em JSON** (response schema do Gemini) e validar com Pydantic.
+- `AI_API_KEY` vive **só** no backend, **nunca** versionada (obrigatória em prod).
+- Integração isolada no `GeminiGateway`; prompt/validação no `ai_service`.
+- **Sem mock** — `get_ai_gateway()` levanta erro se faltar a chave.
+- `system_instruction` separado do conteúdo (reduz prompt-injection).
+- Schemas **tipados** (ex.: `PontoMapa`) — structured output rejeita `dict` cru.

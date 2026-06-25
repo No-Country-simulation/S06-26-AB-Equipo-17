@@ -1,15 +1,19 @@
 """Gateway de IA — porta de saída para o LLM externo (Google Gemini).
 
-Contrato mínimo: recebe um prompt (texto) + o schema esperado e devolve JSON (texto).
+Contrato: recebe `prompt` (conteúdo do usuário), um `system` (instruções) e o
+`response_schema` (modelo Pydantic da saída); devolve JSON (texto).
 Não há mock — a IA é plugada direto (Gemini). Quem monta prompt e valida é o `AIService`.
 """
 from typing import Protocol
+
+from pydantic import BaseModel
 
 from app.core.config import settings
 
 
 class AIGateway(Protocol):
-    def gerar(self, prompt: str, schema: dict) -> str:
+    def gerar(self, prompt: str, *, system: str | None = None,
+              response_schema: type[BaseModel]) -> str:
         ...
 
 
