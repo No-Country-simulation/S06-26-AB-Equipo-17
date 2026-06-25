@@ -3,6 +3,8 @@ import { IconButton } from "./components/IconButton";
 import { NavItem } from "./components/NavItem";
 import { TabNav } from "./components/TabNav";
 import { KpiCardLarge, KpiCardSmall } from "./components/KpiCard";
+import { AIQueryBar } from "./components/AIQueryBar";
+import { AlertBadge } from "./components/AlertBadge";
 
 /** Ícone de exemplo (quadrado arredondado). `currentColor` herda a cor do estado. */
 function SquareGlyph({ size = 18 }: { size?: number }) {
@@ -37,9 +39,13 @@ function Demo({ label, children }: { label: string; children: React.ReactNode })
 }
 
 function App() {
-  const [ativo, setAtivo] = useState(false);
-  const [tab, setTab] = useState("visao");
-  const [rota, setRota] = useState("mapa");
+  const [active, setActive] = useState(false);
+  const [tab, setTab] = useState("overview");
+  const [route, setRoute] = useState("map");
+  const [query, setQuery] = useState("");
+  const [filledQuery, setFilledQuery] = useState(
+    "Densidade Populacional por Região",
+  );
 
   return (
     <div className="min-h-screen bg-app p-10">
@@ -82,6 +88,36 @@ function App() {
           </div>
         </Section>
 
+        {/* ---- Campo de busca (AI Query) ---- */}
+        <Section title="Campo de busca — AI Query">
+          <div className="max-w-md space-y-4">
+            <div className="space-y-1">
+              <span className="text-caption text-ink-muted">
+                Vazio (clique para focar → anel azul)
+              </span>
+              <AIQueryBar
+                value={query}
+                onChange={setQuery}
+                onSubmit={(v) => console.log("search:", v)}
+              />
+            </div>
+            <div className="space-y-1">
+              <span className="text-caption text-ink-muted">Com valor</span>
+              <AIQueryBar value={filledQuery} onChange={setFilledQuery} />
+            </div>
+          </div>
+        </Section>
+
+        {/* ---- Crachá de alerta ---- */}
+        <Section title="Crachá de alerta — status">
+          <div className="flex flex-wrap items-center gap-4">
+            <AlertBadge status="warning" />
+            <AlertBadge status="critical" />
+            <AlertBadge status="success" />
+            <AlertBadge status="info" />
+          </div>
+        </Section>
+
         {/* ---- Cartão KPI ---- */}
         <Section title="Cartão KPI">
           <div className="flex flex-wrap items-start gap-6">
@@ -121,7 +157,7 @@ function App() {
               </IconButton>
             </Demo>
             <Demo label="Interativo (clique)">
-              <IconButton label="Alternar" active={ativo} onClick={() => setAtivo((v) => !v)}>
+              <IconButton label="Alternar" active={active} onClick={() => setActive((v) => !v)}>
                 <SquareGlyph />
               </IconButton>
             </Demo>
@@ -135,10 +171,10 @@ function App() {
             value={tab}
             onChange={setTab}
             items={[
-              { value: "visao", label: "Visão Geral" },
-              { value: "dados", label: "Dados" },
-              { value: "mapa", label: "Mapa" },
-              { value: "sobre", label: "Sobre", disabled: true },
+              { value: "overview", label: "Visão Geral" },
+              { value: "data", label: "Dados" },
+              { value: "map", label: "Mapa" },
+              { value: "about", label: "Sobre", disabled: true },
             ]}
           />
           <p className="text-caption text-ink-muted">Aba ativa: {tab}</p>
@@ -150,18 +186,18 @@ function App() {
             <NavItem
               label="Mapa"
               icon={<SquareGlyph size={22} />}
-              active={rota === "mapa"}
-              onClick={() => setRota("mapa")}
+              active={route === "map"}
+              onClick={() => setRoute("map")}
             />
             <NavItem
               label="Dados"
               icon={<SquareGlyph size={22} />}
-              active={rota === "dados"}
-              onClick={() => setRota("dados")}
+              active={route === "data"}
+              onClick={() => setRoute("data")}
             />
             <NavItem label="Sobre" icon={<SquareGlyph size={22} />} disabled />
           </div>
-          <p className="text-caption text-ink-muted">Rota ativa: {rota}</p>
+          <p className="text-caption text-ink-muted">Rota ativa: {route}</p>
         </Section>
       </div>
     </div>
