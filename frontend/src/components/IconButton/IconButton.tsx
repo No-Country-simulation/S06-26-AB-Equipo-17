@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
+import { cx, styles } from './IconButton.styles'
+import { resolveState, stateStyles } from './IconButton.states'
 
-type IconButtonProps = {
+export type IconButtonProps = {
   /** Texto para acessibilidade (lido por leitores de tela). */
   label: string
   /** Estado selecionado/ativo (ex.: filtro ligado, aba selecionada). */
@@ -23,13 +25,7 @@ export function IconButton({ label, active = false, onClick, children }: IconBut
       aria-label={label}
       aria-pressed={active}
       onClick={onClick}
-      className={[
-        'inline-flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60',
-        active
-          ? 'bg-blue-50 text-blue-600 ring-2 ring-blue-500'
-          : 'bg-white text-gray-500 shadow-sm ring-1 ring-black/5 hover:bg-gray-100 hover:text-gray-700',
-      ].join(' ')}
+      className={cx(styles.root, stateStyles[resolveState({ active })])}
     >
       {children}
     </button>
