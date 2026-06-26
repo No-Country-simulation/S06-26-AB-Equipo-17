@@ -16,8 +16,8 @@ export const styles = {
     "rounded-card transition-colors",
     "outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
   ),
-  /** Caixa do ícone — herda a cor do estado (use SVG com fill="currentColor"). */
-  icon: "inline-flex h-8 w-8 items-center justify-center",
-  /** Rótulo "Mapa" — Rótulo Pequeno (13px/500). */
-  label: "text-label leading-none",
+  /** Caixa do ícone — força o SVG a 28px (ícone maior). Herda a cor do estado. */
+  icon: "inline-flex items-center justify-center [&>svg]:size-7",
+  /** Rótulo "Mapa" — Legenda (12px), menor que o ícone. */
+  label: "text-caption leading-none",
 } as const;
