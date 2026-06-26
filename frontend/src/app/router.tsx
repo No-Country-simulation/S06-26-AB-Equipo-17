@@ -7,15 +7,14 @@ import { AppLayout } from "./AppLayout";
 import { PageFallback } from "./PageFallback";
 import { PlaceholderPage } from "../pages/PlaceholderPage";
 
-// Páginas pesadas/raras viram chunks separados (lazy) — tiram Leaflet e o
-// playground do carregamento inicial.
+// Páginas pesadas/raras viram chunks separados (lazy) — tiram o Leaflet
+// do carregamento inicial.
 const SignInPage = lazy(() =>
   import("../pages/SignInPage").then((m) => ({ default: m.SignInPage })),
 );
 const MapPage = lazy(() =>
   import("../pages/MapPage").then((m) => ({ default: m.MapPage })),
 );
-const DevPlayground = lazy(() => import("../App"));
 
 /** Envolve um elemento lazy no Suspense (fallback de carregamento). */
 const suspense = (node: ReactNode) => <Suspense fallback={<PageFallback />}>{node}</Suspense>;
@@ -23,12 +22,10 @@ const suspense = (node: ReactNode) => <Suspense fallback={<PageFallback />}>{nod
 /**
  * Rotas do app.
  *  /        → SignInPage (primeira página)
- *  /dev     → playground do design system (componentes + tokens)
  *  /app/*   → casca (AppLayout) + páginas internas; o Suspense vive no AppLayout (<Outlet/>)
  */
 export const router = createBrowserRouter([
   { path: "/", element: suspense(<SignInPage />) },
-  { path: "/dev", element: suspense(<DevPlayground />) },
   {
     path: "/app",
     element: <AppLayout />,
