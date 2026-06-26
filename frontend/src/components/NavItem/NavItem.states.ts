@@ -31,9 +31,9 @@ export const stateStyles: Record<NavItemState, StateClasses> = {
     icon: "text-ink-muted",
     label: "text-ink",
   },
-  // Ativo: anel azul + fundo azul-claro, ícone e rótulo em azul.
+  // Ativo: tile elevado — fundo azul-claro + anel azul + sombra, ícone/rótulo azuis.
   active: {
-    root: "bg-primary-soft ring-2 ring-primary",
+    root: "bg-primary-soft ring-2 ring-primary shadow-elev-2",
     icon: "text-primary",
     label: "text-primary",
   },
