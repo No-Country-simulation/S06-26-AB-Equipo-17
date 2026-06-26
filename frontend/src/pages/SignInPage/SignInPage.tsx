@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { TextField } from "../../components/TextField";
 import { Logo } from "../../components/Logo";
@@ -12,13 +13,15 @@ function CheckGlyph() {
 }
 
 export function SignInPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     // TODO: autenticar via api/ quando o endpoint de login existir.
-    console.log("login:", { email });
+    // Por enquanto, entra direto na casca do app.
+    navigate("/app");
   }
 
   return (
