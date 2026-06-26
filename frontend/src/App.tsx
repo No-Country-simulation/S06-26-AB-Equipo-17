@@ -4,9 +4,12 @@ import { NavItem } from "./components/NavItem";
 import { TabNav } from "./components/TabNav";
 import { KpiCardLarge, KpiCardSmall } from "./components/KpiCard";
 import { AIQueryBar } from "./components/AIQueryBar";
+import { AIPrompt } from "./components/AIPrompt";
 import { AlertBadge } from "./components/AlertBadge";
 import { MapPin } from "./components/MapPin";
 import { Avatar } from "./components/Avatar";
+import { SideAppBar } from "./components/SideAppBar";
+import { PinIcon, BarsIcon, DocIcon, BellIcon } from "./components/icons";
 
 /** Ícone de exemplo (quadrado arredondado). `currentColor` herda a cor do estado. */
 function SquareGlyph({ size = 18 }: { size?: number }) {
@@ -16,6 +19,14 @@ function SquareGlyph({ size = 18 }: { size?: number }) {
     </svg>
   );
 }
+
+/** Itens do menu lateral (mock por enquanto). */
+const sideNavItems = [
+  { value: "map", label: "Mapa", icon: <PinIcon /> },
+  { value: "analytics", label: "Analytics", icon: <BarsIcon /> },
+  { value: "reports", label: "Relatórios", icon: <DocIcon /> },
+  { value: "alerts", label: "Alertas", icon: <BellIcon /> },
+];
 
 /** Cabeçalho de seção no padrão do design system. */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -44,7 +55,9 @@ function App() {
   const [active, setActive] = useState(false);
   const [tab, setTab] = useState("overview");
   const [route, setRoute] = useState("map");
+  const [side, setSide] = useState("map");
   const [query, setQuery] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [filledQuery, setFilledQuery] = useState(
     "Densidade Populacional por Região",
   );
@@ -90,6 +103,17 @@ function App() {
           </div>
         </Section>
 
+        {/* ---- Prompt hero da IA ---- */}
+        <Section title="AIPrompt — primeiro prompt da IA">
+          <div className="max-w-2xl">
+            <AIPrompt
+              value={prompt}
+              onChange={setPrompt}
+              onSubmit={(v) => console.log("prompt:", v)}
+            />
+          </div>
+        </Section>
+
         {/* ---- Campo de busca (AI Query) ---- */}
         <Section title="Campo de busca — AI Query">
           <div className="max-w-md space-y-4">
@@ -108,6 +132,12 @@ function App() {
               <AIQueryBar value={filledQuery} onChange={setFilledQuery} />
             </div>
           </div>
+        </Section>
+
+        {/* ---- SideAppBar ---- */}
+        <Section title="SideAppBar — barra lateral">
+          <SideAppBar items={sideNavItems} activeValue={side} onNavigate={setSide} />
+          <p className="text-caption text-ink-muted">Item ativo: {side}</p>
         </Section>
 
         {/* ---- Avatar do usuário ---- */}
