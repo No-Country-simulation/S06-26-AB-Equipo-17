@@ -1,5 +1,5 @@
 /* ============================================================
-   MapPin — ESTADOS (do print do DS)
+   MapPin — ESTADOS
      default   -> Padrão      : cinza-claro, ícone cinza
      selected  -> Selecionado : azul, ícone branco + glow azul
      alert     -> Alerta      : vermelho, ícone branco + glow vermelho

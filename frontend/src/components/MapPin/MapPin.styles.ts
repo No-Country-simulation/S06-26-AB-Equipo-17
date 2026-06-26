@@ -1,5 +1,5 @@
 /* ============================================================
-   MapPin — ESTILO (estrutura fixa)
+   MapPin — ESTILO
    Marcador circular do mapa · ícone centralizado. As cores por
    estado ficam em ./MapPin.states.ts.
    ============================================================ */
