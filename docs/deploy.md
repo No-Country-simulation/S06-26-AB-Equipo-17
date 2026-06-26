@@ -43,7 +43,7 @@ cada um apontando para uma subpasta via `rootDir`.
    - Em `appbit-web` → env `VITE_API_URL` = URL **completa** da API (`https://appbit-api.onrender.com`)
    - Em `appbit-api` → env `FRONTEND_ORIGIN` = URL **completa** do frontend (`https://appbit-web.onrender.com`)
 5. **Rebuild o frontend** (passo crítico — ver pegadinha do Vite abaixo).
-6. (Quando tiver a chave) em `appbit-api` → `AI_PROVIDER=gemini` + `AI_API_KEY=...`,
+6. (Quando tiver a chave) em `appbit-api` → `AI_API_KEY=...`,
    e redeploy do backend.
 
 ## ⚠️ As 2 pegadinhas que mais derrubam iniciantes

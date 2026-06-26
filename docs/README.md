@@ -13,7 +13,7 @@ Documentação técnica do **Painel de Dados Públicos com IA**.
 | [arquitetura.md](./arquitetura.md) | Visão geral, stack escolhida, camadas e fluxo de dados |
 | [decisoes-tecnicas.md](./decisoes-tecnicas.md) | Registro das decisões (ADR) — **por que** escolhemos cada coisa |
 | [contrato-integracao.md](./contrato-integracao.md) | Contrato da API (`/dados`, `/mapa`) — destrava o trabalho em paralelo |
-| [agente-ia.md](./agente-ia.md) | Design do agente de IA, desafios de produção e camada provider-agnostic |
+| [agente-ia.md](./agente-ia.md) | Design do agente de IA (service + gateway Gemini) e desafios de produção |
 | [dados-visent.md](./dados-visent.md) | O que é o dataset Vísent CDRView e o que usamos no MVP |
 | [pipeline-dados.md](./pipeline-dados.md) | Pipeline ETL de ingestão do Vísent (extract → transform → validate → load) |
 | [deploy.md](./deploy.md) | Deploy do monorepo no Render (2 apps, 1 repo) + pegadinhas de CORS/Vite |

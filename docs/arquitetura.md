@@ -33,7 +33,7 @@ filtra os dados reais e só então pede à IA que **redija** a resposta usando *
 | Backend | **Python 3.11+ + FastAPI** | Docs automáticas em `/docs`; async |
 | Validação | **Pydantic v2** | Garante o formato do "paper" na entrada e saída |
 | Dados | **pandas** (DataFrame em memória) | Carrega no startup; ~8 mil linhas; só leitura |
-| IA | **ai_service + ai_gateway** | service monta prompt; gateway plugável: `MockGateway` → `GeminiGateway` |
+| IA | **ai_service + ai_gateway** | service monta prompt; gateway = adapter Gemini (`GeminiGateway`, sem mock) |
 | PDF | **react-to-print** (frontend) | Exporta o card de resultado |
 | Deploy | **Render** (2 serviços) | `web` (frontend estático) + `api` (uvicorn) |
 

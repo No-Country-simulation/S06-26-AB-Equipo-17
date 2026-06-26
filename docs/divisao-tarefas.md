@@ -10,7 +10,7 @@ backend devolve resposta **mockada** no formato do contrato — então todas as 
 |---|---|---|---|---|
 | 1 | **Dados / Pipeline** | Python, pandas | Baixar zip → `backend/dataset/`, rodar `ingest.py` → `concentracao.parquet` | Cruzamento concentração × qualidade de rede × renda; fontes plugáveis |
 | 2 | **Backend / API** | Python, FastAPI, Pydantic | `/health`, `/mapa` e `/dados` com **mock** no formato do contrato | Conectar rotas ao `data_service` real |
-| 3 | **Agente de IA** | Python | `MockProvider` redigindo o "paper" a partir de dados | Plugar o `GeminiProvider` (SDK google-genai) |
+| 3 | **Agente de IA** | Python | `ai_service` (monta prompt) + `ai_gateway` (adapter) | Plugar o `GeminiGateway` (SDK google-genai) + `AI_API_KEY` |
 | 4 | **Mapa** | React, react-leaflet | `MapaRegioes` com Leaflet + 1 município de Floripa (estático) | Consumir `/mapa`; cores por indicador |
 | 5 | **Consulta / UI / PDF** | React, TS | `AIQueryBar` + card `ResultadoPaper` + responsivo | Consumir `/dados`; exportar PDF (react-to-print) |
 | 6 | **Infra / Deploy / Docs** | Render, Git | `render.yaml`, `.env.example`, CORS, README; conectar front↔back | Deploy contínuo; manter docs atualizadas |

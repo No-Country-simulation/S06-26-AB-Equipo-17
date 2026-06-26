@@ -79,7 +79,7 @@ Monorepo no **Render** com `render.yaml`: 1 **site estático** (frontend, gráti
 |---|---|
 | Dados / Pipeline | Ingestão e cruzamento do Vísent (pandas) |
 | Backend / API | `/dados`, `/mapa`, `/health` (FastAPI) |
-| Agente de IA | Camada provider-agnostic + formato "paper" |
+| Agente de IA | Service (monta prompt) + gateway Gemini + formato "paper" |
 | Mapa | Visualização geográfica (Leaflet) |
 | Consulta / UI / PDF | Barra de IA, card de resultado, export PDF, responsividade |
 | Infra / Deploy / Docs | Render, `.env`, CORS, documentação |

@@ -82,7 +82,7 @@ fundamentada*, não só dados. Ver schema em [contrato-integracao.md](./contrato
 ---
 
 ## ADR-006 — Agente de IA provider-agnostic, com Mock como default
-**Data:** 2026-06-18 · **Status:** Aceito
+**Data:** 2026-06-18 · **Status:** ⚠️ Atualizado pela ADR-014 (mock removido; Gemini direto)
 
 **Contexto:** o provedor de IA ainda não foi definido; pode faltar chave/crédito.
 
@@ -163,10 +163,10 @@ por sessão — não nas tabelas pequenas. O `tensor_concentracao` traz proxies 
 
 **Decisão:** o provedor real é o **Google Gemini** (API), via SDK Python **`google-genai`**.
 Modelo: um **Flash** (rápido/barato), ex. `gemini-3.5-flash` (confirmar versão na doc oficial).
-Ativado por `AI_PROVIDER=gemini` + `AI_API_KEY`; o `MockProvider` segue como default até a chave existir.
+Ativado por `AI_API_KEY` (o mock foi removido em 25/06 — ver ADR-014).
 
 **Motivos:** tier gratuito generoso, boa saída estruturada (response schema JSON), SDK simples.
-A abstração do ADR-006 mantém o Mock como fallback e isola o `GeminiProvider` num arquivo.
+A integração fica isolada no `GeminiGateway`; o `ai_service` monta o prompt e valida.
 
 ---
 
@@ -216,6 +216,26 @@ Convenções:
 adicionar estados e garante que todos os componentes consumam os mesmos tokens (identidade visual única).
 
 **Trade-off:** mais arquivos por componente. Aceito — paga em legibilidade e consistência.
+
+---
+
+## ADR-014 — Mock de IA removido: Gemini direto
+**Data:** 2026-06-25 · **Status:** Aceito (atualiza ADR-006 e ADR-011)
+
+**Contexto:** o ADR-006 previa um `MockProvider` como default (destravar sem chave). A equipe
+decidiu plugar o **Gemini direto** — sem mock.
+
+**Decisão:** remover o mock (`MockGateway`) e a seleção por `AI_PROVIDER`. O `get_ai_gateway()`
+retorna sempre o `GeminiGateway` e **levanta erro claro se faltar `AI_API_KEY`**. O `data_service`
+devolve `[]` (sem dados falsos) até o Parquet existir. A robustez fica num **try/except** no
+`ai_service` (IA falhou/voltou inválido → "paper" `confiança: baixa`, sem 500).
+
+**Implementação do Gemini (correção):** usar `client.models.generate_content(model, contents, config)`
+— **não** `interactions.create` — com `response_mime_type="application/json"` +
+`response_schema=RespostaPaper` (modelo Pydantic). Schemas **tipados** (`PontoMapa`, não `dict` cru).
+
+**Trade-off:** não dá mais pra demonstrar sem a chave do Gemini. Aceito — a chave é simples de
+obter e o fallback evita travar a tela.
 Já aplicado em `IconButton`, `NavItem`, `TabNav`, `KpiCard`.
 
 ---
