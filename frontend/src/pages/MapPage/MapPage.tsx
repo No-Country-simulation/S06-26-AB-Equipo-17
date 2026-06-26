@@ -1,0 +1,80 @@
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { useState } from "react";
+import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
+import type { FeatureCollection } from "geojson";
+import { AIPrompt } from "../../components/AIPrompt";
+import { regionStyle } from "./regions";
+import bairros from "./bairros.json";
+
+// Corrige os ícones padrão do Leaflet com bundlers (Vite resolve as imagens
+// como URLs; sem isso o marker fica quebrado). Mantido para os ícones de
+// referência que serão renderizados sobre os bairros futuramente.
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+});
+
+/** Bairros de Florianópolis (fronteiras do OpenStreetMap, admin_level=10). */
+const BAIRROS = bairros as FeatureCollection;
+
+/** Enquadramento inicial = limites dos bairros de Florianópolis. Derivar dos
+ *  dados é mais robusto que center/zoom fixos — abre sempre enquadrado em Floripa. */
+const BOUNDS = L.geoJSON(BAIRROS).getBounds();
+
+/**
+ * Tela inicial do app — mapa temático de Florianópolis: basemap claro sem
+ * rótulos + bairros coloridos em tons pastel. O prompt da IA fica sobreposto.
+ *
+ * Estrutura preparada para receber, no futuro, uma camada de <Marker>/divIcon
+ * com ícones de referência sobre os bairros (o markerPane do Leaflet já
+ * renderiza ícones acima dos polígonos, sem ajuste de z-index).
+ */
+export function MapPage() {
+  const [prompt, setPrompt] = useState("");
+
+  return (
+    <div className="relative isolate z-0 min-h-0 w-full flex-1">
+      <MapContainer
+        bounds={BOUNDS}
+        boundsOptions={{ padding: [24, 24] }}
+        scrollWheelZoom
+        className="h-full w-full"
+      >
+        {/* Basemap claro sem nomes de rua — só o contexto água/terra (CARTO). */}
+        <TileLayer
+          attribution='&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+        />
+
+        {/* Bairros — manchas pastel com borda branca; tooltip no hover. */}
+        <GeoJSON
+          data={BAIRROS}
+          style={regionStyle}
+          onEachFeature={(feature, layer) => {
+            const name = feature.properties?.name as string | undefined;
+            if (name) layer.bindTooltip(name, { sticky: true });
+          }}
+        />
+      </MapContainer>
+
+      {/* Prompt da IA sobreposto — centralizado, deslocado do rodapé.
+          pointer-events-none no overlay deixa o mapa arrastável ao redor;
+          z acima dos panes/controls do Leaflet. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-8 z-[1000] flex justify-center px-4">
+        <div className="pointer-events-auto w-full max-w-2xl">
+          <AIPrompt
+            value={prompt}
+            onChange={setPrompt}
+            onSubmit={(v) => console.log("prompt:", v)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
