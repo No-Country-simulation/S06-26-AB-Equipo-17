@@ -29,6 +29,10 @@
   /* ---- LINHAS / BORDAS (derivado, não está no DS) ---- */
   --color-line: #e6e7ec;
 
+  /* ---- SUPERFÍCIES ESCURAS (painel auth/hero) — estimadas do print ---- */
+  --color-navy: #0a0e1a;        /* base do painel escuro                 */
+  --color-navy-glow: #1e2d49;   /* azul mais claro dos glows radiais     */
+
   /* ---- REGIÕES (mapa / chips de região) ---- */
   --color-region-1: #dce8dd;
   --color-region-2: #e0d6e7;
