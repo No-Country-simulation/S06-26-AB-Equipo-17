@@ -16,4 +16,8 @@
 
   /* Elevação 3 — overlays (dialog, popover, dropdown). */
   --shadow-elev-3: 0 6px 12px rgb(22 23 27 / 0.08), 0 12px 24px rgb(22 23 27 / 0.10);
+
+  /* Glow colorido — destaque de pins selecionados / em alerta no mapa. */
+  --shadow-glow-primary: 0 4px 16px rgb(47 107 255 / 0.45);   /* azul (primary) */
+  --shadow-glow-critical: 0 4px 16px rgb(238 71 50 / 0.45);   /* vermelho (critical) */
 }
