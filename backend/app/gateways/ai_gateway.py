@@ -8,17 +8,19 @@ A checagem da chave fica DENTRO do `GeminiGateway.gerar()` (não aqui) — assim
 `AI_API_KEY`, o erro é capturado pelo `AIService` (fallback) em vez de virar 500 na
 resolução da dependência.
 """
+
 from typing import Protocol
 
 from pydantic import BaseModel
 
 
 class AIGateway(Protocol):
-    def gerar(self, prompt: str, *, system: str | None = None,
-              response_schema: type[BaseModel]) -> str:
-        ...
+    def gerar(
+        self, prompt: str, *, system: str | None = None, response_schema: type[BaseModel]
+    ) -> str: ...
 
 
 def get_ai_gateway() -> AIGateway:
     from app.gateways.gemini_gateway import GeminiGateway  # import lazy
+
     return GeminiGateway()

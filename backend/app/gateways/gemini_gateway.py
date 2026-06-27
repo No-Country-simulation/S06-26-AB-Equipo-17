@@ -5,6 +5,7 @@ Client criado de forma lazy: se faltar a chave, o erro acontece em `gerar()` (n�
 resolução da dependência) → o `AIService` captura e devolve um "paper" de baixa confiança.
 Ref.: https://ai.google.dev/gemini-api/docs/structured-output
 """
+
 from pydantic import BaseModel
 
 from app.core.config import settings
@@ -21,11 +22,13 @@ class GeminiGateway:
             if not settings.ai_api_key:
                 raise RuntimeError("AI_API_KEY ausente — configure a chave do Gemini.")
             from google import genai  # import lazy
+
             self._client = genai.Client(api_key=settings.ai_api_key)
         return self._client
 
-    def gerar(self, prompt: str, *, system: str | None = None,
-              response_schema: type[BaseModel]) -> str:
+    def gerar(
+        self, prompt: str, *, system: str | None = None, response_schema: type[BaseModel]
+    ) -> str:
         resp = self._client_ou_erro().models.generate_content(
             model=settings.ai_model,
             contents=prompt,
