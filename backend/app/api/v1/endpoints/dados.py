@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.schemas.dados import ConsultaRequest, RespostaPaper
 from app.services import data_service
+from app.api.deps import get_ai_service
 
 router = APIRouter()
 
@@ -11,7 +12,9 @@ def consultar_dados(body: ConsultaRequest) -> RespostaPaper:
     limite=10,
  )
  
- return RespostaPaper(
-  afirmacao=f"Consulta recebida: '{body.consulta}'. Dados em processamento.",
-  nivel_confianca="media",
+ ai_service = get_ai_service()
+ return ai_service.responder(
+    consulta=body.consulta,
+    dados=dados,
+    idioma=body.idioma,
  )
