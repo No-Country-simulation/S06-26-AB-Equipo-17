@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
 import type { FeatureCollection } from "geojson";
 import { AIPrompt } from "../../components/AIPrompt";
+import { QueryFlowModal } from "../../features/query-flow";
 import { regionStyle } from "./regions";
 import bairros from "./bairros.json";
 
@@ -37,6 +38,9 @@ const BOUNDS = L.geoJSON(BAIRROS).getBounds();
  */
 export function MapPage() {
   const [prompt, setPrompt] = useState("");
+  const [flowOpen, setFlowOpen] = useState(false);
+  // Muda a cada abertura → remonta o modal pegando o texto atual do prompt.
+  const [flowSeed, setFlowSeed] = useState(0);
 
   return (
     <div className="relative isolate z-0 min-h-0 w-full flex-1">
@@ -71,10 +75,21 @@ export function MapPage() {
           <AIPrompt
             value={prompt}
             onChange={setPrompt}
-            onSubmit={(v) => console.log("prompt:", v)}
+            onSubmit={() => {
+              setFlowSeed((s) => s + 1);
+              setFlowOpen(true);
+            }}
           />
         </div>
       </div>
+
+      {/* Fluxo de consulta — abre ao enviar o prompt, com o texto digitado. */}
+      <QueryFlowModal
+        key={flowSeed}
+        open={flowOpen}
+        onOpenChange={setFlowOpen}
+        initialQuestion={prompt}
+      />
     </div>
   );
 }
