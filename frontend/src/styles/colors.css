@@ -29,6 +29,10 @@
   /* ---- LINHAS / BORDAS (derivado, não está no DS) ---- */
   --color-line: #e6e7ec;
 
+  /* ---- DESABILITADO (botões/controles) — do design ---- */
+  --color-disabled: #e5e5ea;            /* fundo  */
+  --color-disabled-foreground: #9ca3af; /* texto  */
+
   /* ---- SUPERFÍCIES ESCURAS (painel auth/hero) — estimadas do print ---- */
   --color-navy: #0a0e1a;        /* base do painel escuro                 */
   --color-navy-glow: #1e2d49;   /* azul mais claro dos glows radiais     */
