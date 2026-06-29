@@ -29,11 +29,27 @@ export type QueryRequest = {
   // TODO: filtros (região, período...)
 };
 
-/** Mini-paper (ADR-005): afirmação → evidências → fontes → confiança. */
-export type Paper = {
+/** Status de uma linha de evidência (sinaleira). */
+export type EvidenceStatus = "critical" | "warning" | "success";
+
+/** Uma linha da tabela de evidência. */
+export type EvidenceRow = {
+  region: string;
+  coverage4g: string;
+  techTraining: string;
+  status: EvidenceStatus;
+};
+
+/**
+ * POST /dados — resultado da consulta ("paper", ADR-005):
+ * afirmação → evidências → fontes.
+ * TODO: alinhar com contrato-integracao.md quando o backend fechar.
+ */
+export type QueryResult = {
   claim: string;
-  evidence: string[];
+  evidence: EvidenceRow[];
   sources: string[];
-  confidence: "high" | "medium" | "low";
-  // TODO: alinhar com contrato-integracao.md
+  /** Metadados da resposta. */
+  responseTime: string;
+  sourceCount: number;
 };
