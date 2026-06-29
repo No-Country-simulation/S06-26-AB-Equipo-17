@@ -3,10 +3,12 @@
    Junta o Tailwind v4 + os tokens separados por arquivo.
    ============================================================ */
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "./colors.css";
 @import "./fonts.css";
 @import "./shadows.css";
 @import "./radius.css";
+@import "./shadcn.css";
 
 /* ---- Base global ---- */
 body {
