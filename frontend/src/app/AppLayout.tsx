@@ -1,9 +1,12 @@
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { IconButton } from "../components/IconButton";
 import { Logo } from "../components/Logo";
 import { SideAppBar, type SideNavItem } from "../components/SideAppBar";
 import { TopAppBar } from "../components/TopAppBar";
 import { BarsIcon, BellIcon, DocIcon, GearIcon, PinIcon } from "../components/icons";
+import { NotificationsPanel } from "../features/notifications";
+import { SettingsPanel } from "../features/settings";
 import { PageFallback } from "./PageFallback";
 
 /** Navegação lateral (mock). `value` = caminho da rota. */
@@ -17,19 +20,6 @@ const NAV: SideNavItem[] = [
 /** Usuário exibido na casca (mock — app sem autenticação). */
 const MOCK_USER = { name: "Carla Mendes" };
 
-/** Botão de ícone "ghost" (sem chip) — usado nas ações da TopAppBar. */
-function IconAction({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-pill text-ink-muted transition-colors hover:bg-surface-sec hover:text-ink"
-    >
-      {children}
-    </button>
-  );
-}
-
 /**
  * Casca do app — barra superior (full-width) e, abaixo, coluna branca da
  * sidebar + conteúdo da rota (<Outlet/>).
@@ -37,6 +27,8 @@ function IconAction({ label, children }: { label: string; children: ReactNode })
 export function AppLayout() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const current = NAV.find((item) => pathname.startsWith(item.value));
 
@@ -47,12 +39,16 @@ export function AppLayout() {
         title={current?.label}
         actions={
           <>
-            <IconAction label="Configurações">
+            <IconButton variant="ghost" label="Configurações" onClick={() => setSettingsOpen(true)}>
               <GearIcon />
-            </IconAction>
-            <IconAction label="Notificações">
+            </IconButton>
+            <IconButton
+              variant="ghost"
+              label="Notificações"
+              onClick={() => setNotificationsOpen(true)}
+            >
               <BellIcon />
-            </IconAction>
+            </IconButton>
           </>
         }
         user={MOCK_USER}
@@ -74,6 +70,9 @@ export function AppLayout() {
           </Suspense>
         </main>
       </div>
+
+      <NotificationsPanel open={notificationsOpen} onOpenChange={setNotificationsOpen} />
+      <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>
   );
 }
