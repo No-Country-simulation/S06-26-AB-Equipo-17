@@ -8,7 +8,9 @@
     "suggestions": [
       "Which region has the lowest 4G coverage?",
       "Where is tech infrastructure lacking?",
-      "Compare employment and mobility in the East"
+      "Compare employment and mobility in the East",
+      "Which areas combine high concentration and low income?",
+      "Where is congestion and dropped calls highest?"
     ],
     "sourcesLabel": "Sources to query:",
     "submit": "Submit query"

@@ -8,7 +8,9 @@
     "suggestions": [
       "¿Qué región tiene menor cobertura 4G?",
       "¿Dónde falta infraestructura tech?",
-      "Compara empleo y movilidad en el Este"
+      "Compara empleo y movilidad en el Este",
+      "¿Qué zonas combinan alta concentración y baja renta?",
+      "¿Dónde hay más congestión y caídas de llamadas?"
     ],
     "sourcesLabel": "Fuentes a consultar:",
     "submit": "Enviar consulta"
