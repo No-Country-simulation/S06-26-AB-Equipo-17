@@ -47,8 +47,12 @@ def _carregar() -> pd.DataFrame:
         .rename("renda")
         .reset_index()
     )
-    agregado = agregado.merge(renda, left_on="cluster", right_on="home_cluster", how="left")
-    agregado = agregado.drop(columns=["home_cluster"])
+    # join normalizado: os CSV divergem em acento (ex. SAO_JOSE_ROÇADO vs SAO_JOSE_ROCADO),
+    # então casamos pela chave sem acento em vez do nome cru — senão a renda some silenciosamente.
+    renda["_chave"] = renda["home_cluster"].map(_normalizar)
+    agregado["_chave"] = agregado["cluster"].map(_normalizar)
+    agregado = agregado.merge(renda.drop(columns=["home_cluster"]), on="_chave", how="left")
+    agregado = agregado.drop(columns=["_chave"])
 
     # 3) arredonda pra ficar limpo no prompt/IA e no mapa
     agregado["concentracao"] = agregado["concentracao"].round().astype("int64")
