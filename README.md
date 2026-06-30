@@ -46,11 +46,10 @@ Crie um arquivo `.env` baseado no `.env.example`:
 ```
 # Backend
 PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/appbit_b2g
-LLM_API_KEY=sua_chave_aqui
+AI_API_KEY=sua_chave_aqui
 
 # Frontend
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=http://127.0.0.1:8000
 ```
 
 ---
@@ -89,8 +88,6 @@ Consulte o `dataset/README.md` para o dicionário de colunas completo.
 
 ```
 [PWA Frontend] → [API REST] → [Agente IA] → [Dataset Vísent]
-                     ↓
-               [Banco de dados]
 ```
 
 Veja detalhes em `docs/arquitetura.md`
@@ -100,11 +97,8 @@ Veja detalhes em `docs/arquitetura.md`
 ## 👥 Equipe
 
 | Nome | Perfil | GitHub |
-|------|--------|--------|
-| Isabel Ekeminiobong Guimarães Ukoeninn | Cybersecurity Engineer | [@bebelkmn](https://github.com/bebelkmn) |
-| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
+|------|--------|--------|| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
 | Leonardo Behnck | Mobile Developer | [@leonardobehnck](https://github.com/leonardobehnck) |
-| Luiz Eduardo Raposo | Fullstack Developer | [@luizeduardoraposo](https://github.com/luizeduardoraposo) |
 | Noelia Daiana Limp Arriola | UX/UI Designer | [@noeliaarriola](https://github.com/noeliaarriola) |
 | Thayssa Neves | Backend Developer | [@RodaThay](https://github.com/RodaThay) |
 
