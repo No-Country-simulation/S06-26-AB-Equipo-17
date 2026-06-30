@@ -61,12 +61,17 @@ def _carregar() -> pd.DataFrame:
     agregado = agregado.merge(conc_zona, on=["municipio", "cluster", "periodo"], how="left")
     agregado = agregado.drop(columns=["_soma_cong", "_soma_drop", "_peso"])
 
-    # 2) renda predominante por cluster (income_cluster A/B/C/D) — dado real de desigualdade
+    # 2) renda por cluster: % de assinantes nas faixas baixas C+D (income_cluster A>B>C>D).
+    # NÃO usar mode(): C é maioria em todo cluster → mode='C' constante, coluna inútil. O %C+D
+    # é um número real, mas ATENÇÃO: neste dataset a renda é quase uniforme (spread ~2 p.p. entre
+    # zonas, e ruidoso) — não serve pra ranquear "zonas de baixa renda". Ver nota no _SYSTEM.
     assinantes = pd.read_csv(ASSINANTES_CSV)
+    share = assinantes.groupby("home_cluster")["income_cluster"].value_counts(normalize=True)
     renda = (
-        assinantes.groupby("home_cluster")["income_cluster"]
-        .agg(lambda s: s.mode().iat[0] if not s.mode().empty else None)
-        .rename("renda")
+        share.unstack()
+        .reindex(columns=["A", "B", "C", "D"])
+        .fillna(0)
+        .assign(renda_baixa_pct=lambda d: ((d["C"] + d["D"]) * 100).round(1))[["renda_baixa_pct"]]
         .reset_index()
     )
     # join normalizado: os CSV divergem em acento (ex. SAO_JOSE_ROÇADO vs SAO_JOSE_ROCADO),
