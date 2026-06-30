@@ -24,7 +24,8 @@ export class ApiError extends Error {
 
 const http = axios.create({
   baseURL: `${BASE_URL}/api/v1`,
-  timeout: 15000,
+  // A consulta de IA (POST /dados) demora ~20-30s
+  timeout: 45000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -44,5 +45,6 @@ http.interceptors.response.use(
 /** Fachada tipada. Use nos endpoints (api/endpoints.ts). */
 export const api = {
   get: <T>(path: string) => http.get<T>(path).then((r) => r.data),
-  post: <T>(path: string, body?: unknown) => http.post<T>(path, body).then((r) => r.data),
+  post: <T>(path: string, body?: unknown) =>
+    http.post<T>(path, body).then((r) => r.data),
 };
