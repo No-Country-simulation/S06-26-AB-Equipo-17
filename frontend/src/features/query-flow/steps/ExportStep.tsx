@@ -95,6 +95,29 @@ export function ExportStep({ question, result }: ExportStepProps) {
           </p>
           <p className="mt-1 leading-relaxed">{result.claim}</p>
           <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            {t("result.evidence")}
+          </p>
+          <table className="mt-2 w-full border-collapse text-sm">
+            <thead>
+              <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
+                <th className="border-b border-neutral-300 py-1.5 pr-3 font-medium">{t("result.colData")}</th>
+                <th className="border-b border-neutral-300 py-1.5 pr-3 font-medium">{t("result.colValue")}</th>
+                <th className="border-b border-neutral-300 py-1.5 pr-3 font-medium">{t("result.colRegion")}</th>
+                <th className="border-b border-neutral-300 py-1.5 font-medium">{t("result.colPeriod")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {result.evidence.map((row, i) => (
+                <tr key={`${row.label}-${i}`} className="align-top">
+                  <td className="border-b border-neutral-200 py-1.5 pr-3 font-semibold">{row.label}</td>
+                  <td className="border-b border-neutral-200 py-1.5 pr-3 tabular-nums">{row.value}</td>
+                  <td className="border-b border-neutral-200 py-1.5 pr-3">{row.region}</td>
+                  <td className="border-b border-neutral-200 py-1.5 text-neutral-600">{row.period}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
             {t("export.printSources")}
           </p>
           {result.sources.map((source) => (

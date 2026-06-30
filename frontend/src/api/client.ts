@@ -2,7 +2,7 @@
    CLIENT — único ponto que fala HTTP com a API (axios).
    Base = VITE_API_URL + /api/v1. Normaliza erro em ApiError.
    App SEM autenticação: nenhum token/sessão aqui.
-   ⚠️ VITE_API_URL é "assado" no build — rebuildar ao trocar (ver skill).
+   ⚠️ VITE_API_URL é montada no build — rebuildar ao trocar (ver skill).
    endpoints.ts e hooks usam a fachada `api.get/api.post` — não conhecem axios.
    ============================================================ */
 

@@ -25,7 +25,7 @@ export function QueryFlowModal({ open, onOpenChange, initialQuestion = "" }: Que
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         {flow.step === "input" ? (
           <InputStep
             question={flow.question}
