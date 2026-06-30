@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
+import type { ApiLanguage } from "@/types";
 
 import ptBRCommon from "./locales/pt-BR/common.json";
 import ptBRNav from "./locales/pt-BR/nav.json";
@@ -24,6 +25,18 @@ import esNotifications from "./locales/es/notifications.json";
 /** Idiomas suportados — pt-BR é o padrão/fallback. */
 export const LANGUAGES = ["pt-BR", "en", "es"] as const;
 export type Language = (typeof LANGUAGES)[number];
+
+/** Idioma do app (i18n) → código enviado à API (body): pt-BR→pt, en→en, es→es. */
+const APP_TO_API_LANGUAGE: Record<Language, ApiLanguage> = {
+  "pt-BR": "pt",
+  en: "en",
+  es: "es",
+};
+
+/** Converte o idioma atual do app no código da API; fallback `pt`. */
+export function toApiLanguage(lang: string): ApiLanguage {
+  return APP_TO_API_LANGUAGE[lang as Language] ?? "pt";
+}
 
 /** Traduções bundladas (offline-friendly p/ o PWA). Lazy por namespace fica p/ depois. */
 export const resources = {

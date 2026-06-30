@@ -29,10 +29,10 @@
     "title": "Analysis result",
     "meta": "Answer in {{time}} · {{count}} sources queried",
     "evidence": "Evidence",
+    "colData": "Metric",
+    "colValue": "Value",
     "colRegion": "Region",
-    "colCoverage": "4G coverage",
-    "colTech": "Tech education",
-    "colStatus": "Status",
+    "colPeriod": "Period",
     "sources": "Sources",
     "exportPdf": "Export as PDF",
     "refine": "Refine query"

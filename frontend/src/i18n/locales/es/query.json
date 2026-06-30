@@ -29,10 +29,10 @@
     "title": "Resultado del análisis",
     "meta": "Respuesta en {{time}} · {{count}} fuentes consultadas",
     "evidence": "Evidencia",
+    "colData": "Dato",
+    "colValue": "Valor",
     "colRegion": "Región",
-    "colCoverage": "Cobertura 4G",
-    "colTech": "Formación tech",
-    "colStatus": "Estado",
+    "colPeriod": "Período",
     "sources": "Fuentes",
     "exportPdf": "Exportar como PDF",
     "refine": "Refinar consulta"
