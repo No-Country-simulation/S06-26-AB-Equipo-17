@@ -97,7 +97,8 @@ Veja detalhes em `docs/arquitetura.md`
 ## 👥 Equipe
 
 | Nome | Perfil | GitHub |
-|------|--------|--------|| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
+|------|--------|--------|
+| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
 | Leonardo Behnck | Mobile Developer | [@leonardobehnck](https://github.com/leonardobehnck) |
 | Noelia Daiana Limp Arriola | UX/UI Designer | [@noeliaarriola](https://github.com/noeliaarriola) |
 | Thayssa Neves | Backend Developer | [@RodaThay](https://github.com/RodaThay) |
