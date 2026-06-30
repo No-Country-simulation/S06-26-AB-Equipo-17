@@ -17,8 +17,10 @@ import pandas as pd
 DATASET = Path(__file__).resolve().parents[2] / "dataset"
 CONCENTRACAO_CSV = DATASET / "tensor_concentracao.csv"
 ASSINANTES_CSV = DATASET / "assinantes.csv"
+OD_CSV = DATASET / "tensor_od.csv"  # matriz origem→destino por cluster (mobilidade)
 
 _df: pd.DataFrame | None = None
+_mob: pd.DataFrame | None = None
 
 
 def _normalizar(s: str) -> str:
@@ -29,15 +31,35 @@ def _normalizar(s: str) -> str:
 
 def _carregar() -> pd.DataFrame:
     """Lê os CSV e devolve o agregado por município/cluster/período (com renda)."""
-    # 1) concentração + qualidade de rede, média dos 15 dias por zona/período
+    # 1) concentração + qualidade de rede por zona/período. O CSV é por (antena, dia, período);
+    # um cluster tem várias antenas (mediana 6, até 13), então a forma de agregar importa.
     conc = pd.read_csv(CONCENTRACAO_CSV, dtype={"ecgi": str})
+
+    # 1a) taxas (congestionamento, drop): média PONDERADA por n_usuarios — uma antena quase
+    # vazia não pode pesar igual a uma lotada. Vetorizado: soma(taxa*usuários)/soma(usuários).
+    conc["_w_cong"] = conc["congestionamento_medio"] * conc["n_usuarios"]
+    conc["_w_drop"] = conc["drop_pct_medio"] * conc["n_usuarios"]
     agregado = conc.groupby(["municipio", "cluster", "periodo"], as_index=False).agg(
-        concentracao=("n_usuarios", "mean"),
-        congestionamento=("congestionamento_medio", "mean"),
-        drop_rede=("drop_pct_medio", "mean"),
+        _soma_cong=("_w_cong", "sum"),
+        _soma_drop=("_w_drop", "sum"),
+        _peso=("n_usuarios", "sum"),
         lat=("lat", "first"),
         lon=("lon", "first"),
     )
+    peso = agregado["_peso"].replace(0, pd.NA)  # evita divisão por zero (zona sem usuários)
+    agregado["congestionamento"] = agregado["_soma_cong"] / peso
+    agregado["drop_rede"] = agregado["_soma_drop"] / peso
+
+    # 1b) concentração: total de usuários da ZONA (soma entre antenas), média entre dias.
+    # `mean(n_usuarios)` puro diluía o cluster pelo nº de antenas — subestimava zonas densas.
+    por_dia = conc.groupby(["municipio", "cluster", "periodo", "day_date"], as_index=False).agg(
+        usuarios=("n_usuarios", "sum")
+    )
+    conc_zona = por_dia.groupby(["municipio", "cluster", "periodo"], as_index=False).agg(
+        concentracao=("usuarios", "mean")
+    )
+    agregado = agregado.merge(conc_zona, on=["municipio", "cluster", "periodo"], how="left")
+    agregado = agregado.drop(columns=["_soma_cong", "_soma_drop", "_peso"])
 
     # 2) renda predominante por cluster (income_cluster A/B/C/D) — dado real de desigualdade
     assinantes = pd.read_csv(ASSINANTES_CSV)
@@ -95,6 +117,71 @@ def buscar(regiao: str | None = None, limite: int = 50) -> list[dict]:
         out = df[df["_busca"].str.contains(_normalizar(regiao), regex=False)].head(limite)
     else:
         out = df
+
+    registros = out.drop(columns=["_busca"]).to_dict("records")
+    return [{k: _nativo(v) for k, v in r.items()} for r in registros]
+
+
+# --------------------------------------------------------------------------- #
+# Mobilidade (matriz origem→destino por cluster — tensor_od.csv)
+# --------------------------------------------------------------------------- #
+def _carregar_mobilidade() -> pd.DataFrame:
+    """Lê o OD por cluster e devolve colunas limpas pro prompt/mapa (sem agregar)."""
+    od = pd.read_csv(OD_CSV)
+    cols = [
+        "cluster_origem",
+        "municipio_origem",
+        "cluster_destino",
+        "municipio_destino",
+        "mesmo_cluster",
+        "n_usuarios",
+        "n_viagens",
+        "dist_media_km",
+        "periodo_predominante",
+        "lat_origem",
+        "lon_origem",
+        "lat_destino",
+        "lon_destino",
+    ]
+    mob = od[cols].round(
+        {"dist_media_km": 2, "lat_origem": 4, "lon_origem": 4, "lat_destino": 4, "lon_destino": 4}
+    )
+    # coluna oculta de busca: casa origem OU destino (município ou cluster), sem acento
+    mob["_busca"] = (
+        mob["municipio_origem"]
+        + " "
+        + mob["cluster_origem"]
+        + " "
+        + mob["municipio_destino"]
+        + " "
+        + mob["cluster_destino"]
+    ).map(_normalizar)
+    return mob
+
+
+def _mobilidade() -> pd.DataFrame:
+    global _mob
+    if _mob is None:
+        _mob = _carregar_mobilidade() if OD_CSV.exists() else pd.DataFrame()
+    return _mob
+
+
+def buscar_mobilidade(regiao: str | None = None, limite: int = 80) -> list[dict]:
+    """Fluxos origem→destino por cluster.
+
+    Com `regiao`, devolve todos os fluxos que tocam a zona (origem OU destino). Sem
+    `regiao`, devolve os `limite` maiores fluxos por nº de viagens — o OD tem 506 pares
+    e mandar tudo em toda pergunta pesaria no prompt; os maiores fluxos são o que
+    responde "para onde as pessoas mais vão". Trava de segurança em `limite` quando filtrado.
+    """
+    df = _mobilidade()
+    if df.empty:
+        return []
+
+    if regiao:
+        out = df[df["_busca"].str.contains(_normalizar(regiao), regex=False)].head(limite)
+    else:
+        out = df.sort_values("n_viagens", ascending=False).head(limite)
 
     registros = out.drop(columns=["_busca"]).to_dict("records")
     return [{k: _nativo(v) for k, v in r.items()} for r in registros]
