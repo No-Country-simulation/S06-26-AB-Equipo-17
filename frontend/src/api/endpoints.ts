@@ -1,9 +1,17 @@
 /* ============================================================
    ENDPOINTS — uma função tipada por endpoint da API.
-   As páginas NÃO chamam isto direto; usam os hooks (api/hooks).
+   Aqui fica o "anti-corruption layer": o backend fala PT
+   (consulta/idioma/afirmacao/evidencias...) e a gente mapeia
+   pro nosso domínio em EN. As páginas usam os hooks (api/hooks).
    ============================================================ */
 
-import type { HealthStatus, MapData, QueryRequest, QueryResult } from "../types";
+import type {
+  ConfidenceLevel,
+  HealthStatus,
+  MapData,
+  QueryRequest,
+  QueryResult,
+} from "../types";
 import { api } from "./client";
 
 /** GET /api/v1/health — checagem de saúde. */
@@ -16,28 +24,59 @@ export function getMapData() {
   return api.get<MapData>("/mapa");
 }
 
-/* ---- MOCK temporário do backend (consulta de IA) ----
-   Enquanto o endpoint /dados não existe, devolvemos um resultado fixo após
-   um delay (simula a análise). TODO: trocar por `api.post<QueryResult>("/dados", payload)`. */
-const MOCK_RESULT: QueryResult = {
-  claim:
-    "As regiões Leste e Sudoeste da Grande Florianópolis concentram 78% das lacunas de cobertura 4G e possuem menos de 12% de acesso a programas de formação tecnológica, segundo dados do Vísent CDRView cruzados com IBGE 2023.",
-  evidence: [
-    { region: "Leste", coverage4g: "18%", techTraining: "8%", status: "critical" },
-    { region: "Sudoeste", coverage4g: "31%", techTraining: "15%", status: "warning" },
-    { region: "Centro", coverage4g: "87%", techTraining: "54%", status: "success" },
-  ],
-  sources: [
-    "[1] Vísent CDRView — Cobertura de rede e mobilidade por região, Jun 2026",
-    "[2] IBGE Censo 2023 — Indicadores socioeconômicos municipais",
-    "[3] Anatel — Mapa de ERBs e cobertura 4G/5G, Mai 2026",
-  ],
-  responseTime: "4.2s",
-  sourceCount: 3,
+/* ---- Formato bruto do backend (wire) — chaves em PT ---- */
+type QueryResponseDTO = {
+  afirmacao: string;
+  evidencias: { dado: string; valor: string; regiao: string; periodo: string; fonte: string }[];
+  fontes: { nome: string; url: string | null; tipo: string }[];
+  nivel_confianca: string;
+  visualizacao: {
+    tipo: string;
+    dados: { regiao: string; lat: number; lng: number; valor: number }[];
+  } | null;
 };
 
+const CONFIDENCE: Record<string, ConfidenceLevel> = {
+  alta: "high",
+  media: "medium",
+  baixa: "low",
+};
+
+/** Mapeia a resposta do backend (PT) pro nosso QueryResult (EN). */
+function toQueryResult(dto: QueryResponseDTO, responseTime: string): QueryResult {
+  return {
+    claim: dto.afirmacao,
+    evidence: dto.evidencias.map((e) => ({
+      label: e.dado,
+      value: e.valor,
+      region: e.regiao,
+      period: e.periodo,
+      source: e.fonte,
+    })),
+    sources: dto.fontes.map((f) => ({ name: f.nome, url: f.url, type: f.tipo })),
+    confidence: CONFIDENCE[dto.nivel_confianca] ?? "medium",
+    visualization: dto.visualizacao
+      ? {
+          type: dto.visualizacao.tipo,
+          points: dto.visualizacao.dados.map((d) => ({
+            region: d.regiao,
+            lat: d.lat,
+            lng: d.lng,
+            value: d.valor,
+          })),
+        }
+      : null,
+    responseTime,
+  };
+}
+
 /** POST /api/v1/dados — consulta de IA → resultado ("paper"). */
-export function postQuery(_payload: QueryRequest): Promise<QueryResult> {
-  // TODO: return api.post<QueryResult>("/dados", _payload);
-  return new Promise((resolve) => setTimeout(() => resolve(MOCK_RESULT), 2200));
+export async function postQuery(payload: QueryRequest): Promise<QueryResult> {
+  const startedAt = performance.now();
+  const dto = await api.post<QueryResponseDTO>("/dados", {
+    consulta: payload.question,
+    idioma: payload.language,
+  });
+  const responseTime = `${((performance.now() - startedAt) / 1000).toFixed(1)}s`;
+  return toQueryResult(dto, responseTime);
 }
