@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button";
 import { TextField } from "../../components/TextField";
@@ -23,6 +24,7 @@ function CheckGlyph() {
 }
 
 export function SignInPage() {
+  const { t } = useTranslation("signIn");
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,26 +43,17 @@ export function SignInPage() {
         </div>
 
         <div className="max-w-md space-y-6">
-          <h1 className="text-5xl font-bold leading-[1.05]">
-            Decisões baseadas em evidência.
-          </h1>
+          <h1 className="text-5xl font-bold leading-[1.05]">{t("heroTitle")}</h1>
           <div className="space-y-2">
-            <p className="text-title-3">Pergunte. Analise. Decida.</p>
-            <p className="text-body-lg text-ink-inverse/60">
-              Evidência verificável. Fontes citáveis. Decisão com respaldo em 5
-              minutos, não em 5 dias.
-            </p>
+            <p className="text-title-3">{t("heroTagline")}</p>
+            <p className="text-body-lg text-ink-inverse/60">{t("heroSubtitle")}</p>
           </div>
         </div>
 
         <figure className="max-w-md rounded-panel bg-ink-inverse/5 p-6">
-          <blockquote className="text-body text-ink-inverse/80">
-            “O Vísent CDRView cobre regiões com dados de mobilidade, cobertura
-            de rede e indicadores socioeconômicos, cruzáveis em uma única
-            consulta.”
-          </blockquote>
+          <blockquote className="text-body text-ink-inverse/80">{`“${t("quote")}”`}</blockquote>
           <figcaption className="mt-3 text-caption text-ink-inverse/50">
-            — Time AppBiT · Hackathon B2G 2026
+            {t("quoteAuthor")}
           </figcaption>
         </figure>
       </aside>
@@ -72,26 +65,24 @@ export function SignInPage() {
           className="w-full max-w-md space-y-5 rounded-panel bg-surface p-8 shadow-elev-3 ring-1 ring-line"
         >
           <div className="space-y-1">
-            <h2 className="text-title-2 text-ink">Bem-vinda, Carla.</h2>
-            <p className="text-body text-ink-muted">
-              Acesse sua conta institucional para continuar.
-            </p>
+            <h2 className="text-title-2 text-ink">{t("welcome", { name: "Carla" })}</h2>
+            <p className="text-body text-ink-muted">{t("welcomeSubtitle")}</p>
           </div>
 
           <hr className="border-line" />
 
           <TextField
-            label="E-mail institucional"
+            label={t("emailLabel")}
             type="email"
             autoComplete="email"
-            placeholder="nome@prefeitura.gov.br"
+            placeholder={t("emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <div className="space-y-1.5">
             <TextField
-              label="Senha"
+              label={t("passwordLabel")}
               type="password"
               autoComplete="current-password"
               value={password}
@@ -99,37 +90,33 @@ export function SignInPage() {
             />
             <div className="text-right">
               <a href="#" className="text-label text-primary hover:underline">
-                Esqueci minha senha
+                {t("forgotPassword")}
               </a>
             </div>
           </div>
 
           <Button type="submit" variant="primary" fullWidth>
-            Entrar
+            {t("signIn")}
           </Button>
 
           <div className="flex items-center gap-3 text-caption text-ink-muted">
             <span className="h-px flex-1 bg-line" />
-            ou
+            {t("or")}
             <span className="h-px flex-1 bg-line" />
           </div>
 
           <Button type="button" variant="secondary" fullWidth>
-            Entrar com gov.br
+            {t("signInGov")}
           </Button>
 
-          <p className="text-center text-caption text-ink-muted">
-            Acesso restrito a servidores públicos municipais.
-          </p>
+          <p className="text-center text-caption text-ink-muted">{t("restricted")}</p>
         </form>
 
-        <p className="text-caption text-ink-muted">
-          Hackathon App BiT B2G · Jun–Jul 2026
-        </p>
+        <p className="text-caption text-ink-muted">{t("hackathon")}</p>
 
         <span className="inline-flex items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
           <CheckGlyph />
-          Conexão governamental segura
+          {t("secureConnection")}
         </span>
       </main>
     </div>

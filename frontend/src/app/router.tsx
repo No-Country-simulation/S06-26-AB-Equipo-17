@@ -32,9 +32,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="map" replace /> },
       { path: "map", element: <MapPage /> },
-      { path: "analytics", element: <PlaceholderPage title="Analytics" /> },
-      { path: "reports", element: <PlaceholderPage title="Relatórios" /> },
-      { path: "alerts", element: <PlaceholderPage title="Alertas" /> },
+      { path: "analytics", element: <PlaceholderPage titleKey="analytics" /> },
+      { path: "reports", element: <PlaceholderPage titleKey="reports" /> },
+      { path: "alerts", element: <PlaceholderPage titleKey="alerts" /> },
     ],
   },
 ]);

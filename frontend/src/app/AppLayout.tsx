@@ -1,4 +1,5 @@
 import { Suspense, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { IconButton } from "../components/IconButton";
 import { Logo } from "../components/Logo";
@@ -9,13 +10,13 @@ import { NotificationsPanel } from "../features/notifications";
 import { SettingsPanel } from "../features/settings";
 import { PageFallback } from "./PageFallback";
 
-/** Navegação lateral (mock). `value` = caminho da rota. */
-const NAV: SideNavItem[] = [
-  { value: "/app/map", label: "Mapa", icon: <PinIcon /> },
-  { value: "/app/analytics", label: "Analytics", icon: <BarsIcon /> },
-  { value: "/app/reports", label: "Relatórios", icon: <DocIcon /> },
-  { value: "/app/alerts", label: "Alertas", icon: <BellIcon /> },
-];
+/** Navegação lateral (mock). `value` = caminho da rota; `labelKey` = chave i18n (ns nav). */
+const NAV_ITEMS = [
+  { value: "/app/map", labelKey: "map", icon: <PinIcon /> },
+  { value: "/app/analytics", labelKey: "analytics", icon: <BarsIcon /> },
+  { value: "/app/reports", labelKey: "reports", icon: <DocIcon /> },
+  { value: "/app/alerts", labelKey: "alerts", icon: <BellIcon /> },
+] as const;
 
 /** Usuário exibido na casca (mock — app sem autenticação). */
 const MOCK_USER = { name: "Carla Mendes" };
@@ -25,12 +26,19 @@ const MOCK_USER = { name: "Carla Mendes" };
  * sidebar + conteúdo da rota (<Outlet/>).
  */
 export function AppLayout() {
+  const { t } = useTranslation("nav");
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const current = NAV.find((item) => pathname.startsWith(item.value));
+  // Rótulos traduzidos reativos ao idioma; alimentam sidebar e título da topbar.
+  const nav: SideNavItem[] = NAV_ITEMS.map((item) => ({
+    value: item.value,
+    icon: item.icon,
+    label: t(item.labelKey),
+  }));
+  const current = nav.find((item) => pathname.startsWith(item.value));
 
   return (
     <div className="flex min-h-screen flex-col bg-app">
@@ -39,12 +47,12 @@ export function AppLayout() {
         title={current?.label}
         actions={
           <>
-            <IconButton variant="ghost" label="Configurações" onClick={() => setSettingsOpen(true)}>
+            <IconButton variant="ghost" label={t("settings")} onClick={() => setSettingsOpen(true)}>
               <GearIcon />
             </IconButton>
             <IconButton
               variant="ghost"
-              label="Notificações"
+              label={t("notifications")}
               onClick={() => setNotificationsOpen(true)}
             >
               <BellIcon />
@@ -58,7 +66,7 @@ export function AppLayout() {
         {/* Coluna branca da sidebar — card de menu centralizado verticalmente */}
         <aside className="flex w-40 items-center justify-center bg-surface px-4">
           <SideAppBar
-            items={NAV}
+            items={nav}
             activeValue={current?.value ?? ""}
             onNavigate={(value) => navigate(value)}
           />

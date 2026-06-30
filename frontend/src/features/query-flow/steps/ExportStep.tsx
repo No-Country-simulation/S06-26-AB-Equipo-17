@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useReactToPrint } from "react-to-print";
 import { Download, Link2, Scale } from "lucide-react";
 import { Button } from "@/components/Button";
@@ -16,12 +17,13 @@ export type ExportStepProps = {
 
 /** Passo 4 — exportar o relatório (PDF via react-to-print) ou copiar link. */
 export function ExportStep({ question, result }: ExportStepProps) {
+  const { t } = useTranslation("query");
   const [selected, setSelected] = useState<ExportOption>("pdf");
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
     contentRef,
-    documentTitle: "Relatório AppBiT",
+    documentTitle: t("export.printDocTitle"),
   });
 
   function handleExport() {
@@ -35,10 +37,8 @@ export function ExportStep({ question, result }: ExportStepProps) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title-2 text-ink">Exportar relatório</DialogTitle>
-        <DialogDescription className="sr-only">
-          Baixe o relatório em PDF ou copie um link compartilhável
-        </DialogDescription>
+        <DialogTitle className="text-title-2 text-ink">{t("export.title")}</DialogTitle>
+        <DialogDescription className="sr-only">{t("export.srDescription")}</DialogDescription>
       </DialogHeader>
 
       <hr className="border-line" />
@@ -49,28 +49,24 @@ export function ExportStep({ question, result }: ExportStepProps) {
           PDF
         </span>
         <div className="space-y-0.5">
-          <p className="text-body-lg font-semibold text-ink">
-            Relatório — Formação Tech — Região Metropolitana
-          </p>
-          <p className="text-caption text-ink-muted">Gerado em 06/23/2026 · 3 fontes · AppBiT B2G</p>
-          <p className="text-caption text-ink-muted">
-            Afirmação + Evidência + Fontes · Formato de política pública
-          </p>
+          <p className="text-body-lg font-semibold text-ink">{t("export.reportTitle")}</p>
+          <p className="text-caption text-ink-muted">{t("export.reportMeta")}</p>
+          <p className="text-caption text-ink-muted">{t("export.reportFormat")}</p>
         </div>
       </div>
 
       {/* Opções de exportação */}
       <ExportOptionCard
         icon={<Download size={18} />}
-        title="Baixar PDF"
-        description="Estrutura de paper acadêmico com fontes citadas"
+        title={t("export.downloadPdf")}
+        description={t("export.downloadPdfDesc")}
         active={selected === "pdf"}
         onClick={() => setSelected("pdf")}
       />
       <ExportOptionCard
         icon={<Link2 size={18} />}
-        title="Copiar link compartilhável"
-        description="Compartilhe com colegas antes da reunião"
+        title={t("export.copyLink")}
+        description={t("export.copyLinkDesc")}
         active={selected === "link"}
         onClick={() => setSelected("link")}
       />
@@ -78,30 +74,28 @@ export function ExportStep({ question, result }: ExportStepProps) {
       {/* Aviso LGPD */}
       <div className="flex items-center gap-2 rounded-card bg-warning/15 px-3 py-2 text-label text-ink/70">
         <Scale size={14} className="shrink-0 text-warning" />
-        Exportação registrada conforme LGPD · Art. 7º, inciso III
+        {t("export.lgpd")}
       </div>
 
       <Button variant="primary" fullWidth onClick={handleExport}>
-        Baixar relatório
+        {t("export.download")}
       </Button>
 
       {/* Documento imprimível (fora da tela) — react-to-print clona isto. */}
       <div className="pointer-events-none fixed -left-[10000px] top-0" aria-hidden>
         <div ref={contentRef} className="w-[640px] bg-white p-10 text-black">
-          <h1 className="text-2xl font-bold">Relatório — Formação Tech — Região Metropolitana</h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Gerado em 06/23/2026 · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel
-          </p>
+          <h1 className="text-2xl font-bold">{t("export.reportTitle")}</h1>
+          <p className="mt-1 text-sm text-neutral-500">{t("export.printMeta")}</p>
           <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
-            Pergunta
+            {t("export.printQuestion")}
           </p>
           <p className="mt-1">{question}</p>
           <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
-            Resposta
+            {t("export.printAnswer")}
           </p>
           <p className="mt-1 leading-relaxed">{result.claim}</p>
           <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
-            Fontes
+            {t("export.printSources")}
           </p>
           {result.sources.map((source) => (
             <p key={source} className="mt-1 text-sm text-neutral-600">

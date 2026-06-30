@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import "./styles/theme.css";
 import "@fontsource-variable/inter";
+import "./i18n";
 import { router } from "./app/router";
 
 createRoot(document.getElementById("root")!).render(

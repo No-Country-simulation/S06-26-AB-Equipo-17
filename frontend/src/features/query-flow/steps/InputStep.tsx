@@ -1,15 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-/** Perguntas-exemplo (mock por enquanto). */
-const SUGGESTIONS = [
-  "Qual região tem menor cobertura 4G?",
-  "Onde falta infraestrutura tech?",
-  "Compare emprego e mobilidade no Leste",
-];
-
-/** Fontes que a consulta vai cruzar (mock por enquanto). */
+/** Fontes que a consulta vai cruzar (nomes próprios — não traduzidos). */
 const SOURCES = ["Vísent CDRView", "IBGE 2023", "Anatel ERB"];
 
 export type InputStepProps = {
@@ -20,16 +14,17 @@ export type InputStepProps = {
 
 /** Passo 1 — entrada da pergunta em linguagem natural. */
 export function InputStep({ question, onQuestionChange, onSubmit }: InputStepProps) {
+  const { t } = useTranslation("query");
   const canSubmit = question.trim().length > 0;
+  // Perguntas-exemplo (mock por enquanto) — vêm do i18n.
+  const suggestions = t("input.suggestions", { returnObjects: true });
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title-2 text-ink">
-          Consulta em linguagem natural
-        </DialogTitle>
+        <DialogTitle className="text-title-2 text-ink">{t("input.title")}</DialogTitle>
         <DialogDescription className="text-body text-ink-muted">
-          Pergunte como perguntaria a um assessor técnico
+          {t("input.description")}
         </DialogDescription>
       </DialogHeader>
 
@@ -37,21 +32,23 @@ export function InputStep({ question, onQuestionChange, onSubmit }: InputStepPro
 
       <p className="flex items-center gap-2 text-body text-ink">
         <Sparkles size={16} className="text-primary" />
-        Powered by Vísent CDRView + IA
+        {t("input.poweredBy")}
       </p>
 
       <textarea
         value={question}
         onChange={(e) => onQuestionChange(e.target.value)}
-        placeholder="Ex: Onde faltam programas de formação tech na região metropolitana?"
+        placeholder={t("input.placeholder")}
         rows={4}
         className="w-full resize-none rounded-card border border-primary/30 bg-surface-sec p-4 text-body text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-primary focus:ring-2 focus:ring-primary/30"
       />
 
       <div className="space-y-2">
-        <p className="text-caption uppercase tracking-wide text-ink-muted">Sugestões</p>
+        <p className="text-caption uppercase tracking-wide text-ink-muted">
+          {t("input.suggestionsLabel")}
+        </p>
         <div className="flex flex-wrap gap-2">
-          {SUGGESTIONS.map((suggestion) => (
+          {suggestions.map((suggestion) => (
             <button
               key={suggestion}
               type="button"
@@ -67,7 +64,7 @@ export function InputStep({ question, onQuestionChange, onSubmit }: InputStepPro
       <hr className="border-line" />
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-body text-ink-muted">Fontes a consultar:</span>
+        <span className="text-body text-ink-muted">{t("input.sourcesLabel")}</span>
         {SOURCES.map((source) => (
           <span
             key={source}
@@ -79,7 +76,7 @@ export function InputStep({ question, onQuestionChange, onSubmit }: InputStepPro
       </div>
 
       <Button variant="primary" fullWidth disabled={!canSubmit} onClick={onSubmit}>
-        Enviar consulta
+        {t("input.submit")}
       </Button>
     </>
   );

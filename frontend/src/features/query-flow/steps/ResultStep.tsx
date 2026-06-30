@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,10 +23,11 @@ export type ResultStepProps = {
 
 /** Passo 3 — resultado da análise (o "paper"): afirmação → evidências → fontes. */
 export function ResultStep({ question, result, onRefine, onExport }: ResultStepProps) {
+  const { t } = useTranslation("query");
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title-2 text-ink">Resultado da análise</DialogTitle>
+        <DialogTitle className="text-title-2 text-ink">{t("result.title")}</DialogTitle>
         <DialogDescription className="text-body text-ink-muted">{question}</DialogDescription>
       </DialogHeader>
 
@@ -33,7 +35,7 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
         <Zap size={14} />
-        Resposta em {result.responseTime} · {result.sourceCount} fontes consultadas
+        {t("result.meta", { time: result.responseTime, count: result.sourceCount })}
       </span>
 
       {/* Afirmação principal */}
@@ -41,15 +43,15 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       {/* Evidência (tabela) */}
       <div className="space-y-2">
-        <p className="text-caption uppercase tracking-wide text-ink-muted">Evidência</p>
+        <p className="text-caption uppercase tracking-wide text-ink-muted">{t("result.evidence")}</p>
         <div className="overflow-hidden rounded-card border border-line">
           <table className="w-full text-left">
             <thead className="bg-surface-sec">
               <tr className="text-caption uppercase tracking-wide text-ink-muted">
-                <th className="px-4 py-2 font-medium">Região</th>
-                <th className="px-4 py-2 font-medium">Cobertura 4G</th>
-                <th className="px-4 py-2 font-medium">Formação tech</th>
-                <th className="px-4 py-2 font-medium">Status</th>
+                <th className="px-4 py-2 font-medium">{t("result.colRegion")}</th>
+                <th className="px-4 py-2 font-medium">{t("result.colCoverage")}</th>
+                <th className="px-4 py-2 font-medium">{t("result.colTech")}</th>
+                <th className="px-4 py-2 font-medium">{t("result.colStatus")}</th>
               </tr>
             </thead>
             <tbody>
@@ -70,7 +72,7 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       {/* Fontes */}
       <div className="space-y-1">
-        <p className="text-caption uppercase tracking-wide text-ink-muted">Fontes</p>
+        <p className="text-caption uppercase tracking-wide text-ink-muted">{t("result.sources")}</p>
         {result.sources.map((source) => (
           <p key={source} className="text-caption text-ink-muted">
             {source}
@@ -80,10 +82,10 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       <div className="flex gap-3">
         <Button variant="primary" onClick={onExport}>
-          Exportar como PDF
+          {t("result.exportPdf")}
         </Button>
         <Button variant="secondary" onClick={onRefine}>
-          Refinar consulta
+          {t("result.refine")}
         </Button>
       </div>
     </>

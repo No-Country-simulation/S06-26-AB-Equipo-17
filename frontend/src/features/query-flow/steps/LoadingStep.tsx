@@ -1,12 +1,6 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-/** Etapas do processamento (com pontos verdes ao concluir). */
-const PHASES = [
-  "Interpretando consulta",
-  "Buscando dados por região",
-  "Gerando resposta com fontes",
-];
 
 export type LoadingStepProps = {
   /** Pergunta do usuário (vinda do passo anterior). */
@@ -19,28 +13,34 @@ export type LoadingStepProps = {
  * (avança pro resultado quando a request resolve).
  */
 export function LoadingStep({ question }: LoadingStepProps) {
+  const { t } = useTranslation("query");
   const [phaseIndex, setPhaseIndex] = useState(0);
+  // Etapas do processamento (com pontos verdes ao concluir) — vêm do i18n.
+  const phases = t("loading.phases", { returnObjects: true });
+  const phaseCount = phases.length;
 
   useEffect(() => {
     const id = setInterval(() => {
-      setPhaseIndex((i) => Math.min(i + 1, PHASES.length));
+      setPhaseIndex((i) => Math.min(i + 1, phaseCount));
     }, 1200);
     return () => clearInterval(id);
-  }, []);
+  }, [phaseCount]);
 
-  const progress = (phaseIndex / PHASES.length) * 100;
+  const progress = (phaseIndex / phaseCount) * 100;
 
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title-2 text-ink">Analisando dados...</DialogTitle>
-        <DialogDescription className="sr-only">Processando sua consulta</DialogDescription>
+        <DialogTitle className="text-title-2 text-ink">{t("loading.title")}</DialogTitle>
+        <DialogDescription className="sr-only">{t("loading.srDescription")}</DialogDescription>
       </DialogHeader>
 
       <hr className="border-line" />
 
       <div className="rounded-card bg-surface-sec p-4">
-        <p className="text-caption uppercase tracking-wide text-ink-muted">Sua pergunta</p>
+        <p className="text-caption uppercase tracking-wide text-ink-muted">
+          {t("loading.yourQuestion")}
+        </p>
         <p className="text-body text-ink">{question}</p>
       </div>
 
@@ -48,13 +48,11 @@ export function LoadingStep({ question }: LoadingStepProps) {
         <div
           className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary"
           role="status"
-          aria-label="Carregando"
+          aria-label={t("loading.spinnerLabel")}
         />
         <div className="space-y-1 text-center">
-          <p className="text-title-3 text-ink">Analisando dados...</p>
-          <p className="text-body text-ink-muted">
-            Cruzando Vísent CDRView, IBGE 2023 e Anatel ERB
-          </p>
+          <p className="text-title-3 text-ink">{t("loading.title")}</p>
+          <p className="text-body text-ink-muted">{t("loading.crossing")}</p>
         </div>
       </div>
 
@@ -67,7 +65,7 @@ export function LoadingStep({ question }: LoadingStepProps) {
       </div>
 
       <ul className="space-y-2">
-        {PHASES.map((label, index) => {
+        {phases.map((label, index) => {
           const done = index < phaseIndex;
           return (
             <li key={label} className="flex items-center gap-2">
