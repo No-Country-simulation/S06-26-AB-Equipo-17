@@ -17,9 +17,14 @@ export type ExportStepProps = {
 
 /** Passo 4 — exportar o relatório (PDF via react-to-print) ou copiar link. */
 export function ExportStep({ question, result }: ExportStepProps) {
-  const { t } = useTranslation("query");
+  const { t, i18n } = useTranslation("query");
   const [selected, setSelected] = useState<ExportOption>("pdf");
   const contentRef = useRef<HTMLDivElement>(null);
+  // Data de geração (agora) formatada pelo locale + contagem real de fontes.
+  const generatedAt = new Intl.DateTimeFormat(i18n.resolvedLanguage ?? i18n.language).format(
+    new Date(),
+  );
+  const sourceCount = result.sources.length;
 
   const handlePrint = useReactToPrint({
     contentRef,
@@ -50,7 +55,9 @@ export function ExportStep({ question, result }: ExportStepProps) {
         </span>
         <div className="space-y-0.5">
           <p className="text-body-lg font-semibold text-ink">{t("export.reportTitle")}</p>
-          <p className="text-caption text-ink-muted">{t("export.reportMeta")}</p>
+          <p className="text-caption text-ink-muted">
+            {t("export.reportMeta", { date: generatedAt, count: sourceCount })}
+          </p>
           <p className="text-caption text-ink-muted">{t("export.reportFormat")}</p>
         </div>
       </div>
@@ -85,7 +92,7 @@ export function ExportStep({ question, result }: ExportStepProps) {
       <div className="pointer-events-none fixed -left-[10000px] top-0" aria-hidden>
         <div ref={contentRef} className="w-[640px] bg-white p-10 text-black">
           <h1 className="text-2xl font-bold">{t("export.reportTitle")}</h1>
-          <p className="mt-1 text-sm text-neutral-500">{t("export.printMeta")}</p>
+          <p className="mt-1 text-sm text-neutral-500">{t("export.printMeta", { date: generatedAt })}</p>
           <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-neutral-500">
             {t("export.printQuestion")}
           </p>

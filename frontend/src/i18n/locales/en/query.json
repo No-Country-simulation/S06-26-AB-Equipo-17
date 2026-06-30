@@ -43,7 +43,7 @@
     "title": "Export report",
     "srDescription": "Download the report as PDF or copy a shareable link",
     "reportTitle": "Report — Tech Education — Metropolitan Region",
-    "reportMeta": "Generated on 06/23/2026 · 3 sources · AppBiT B2G",
+    "reportMeta": "Generated on {{date}} · {{count}} sources · AppBiT B2G",
     "reportFormat": "Claim + Evidence + Sources · Public policy format",
     "downloadPdf": "Download PDF",
     "downloadPdfDesc": "Academic paper structure with cited sources",
@@ -52,7 +52,7 @@
     "lgpd": "Export logged per LGPD · Art. 7, item III",
     "download": "Download report",
     "printDocTitle": "AppBiT Report",
-    "printMeta": "Generated on 06/23/2026 · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
+    "printMeta": "Generated on {{date}} · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
     "printQuestion": "Question",
     "printAnswer": "Answer",
     "printSources": "Sources"

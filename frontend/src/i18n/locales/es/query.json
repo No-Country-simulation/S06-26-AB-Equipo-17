@@ -43,7 +43,7 @@
     "title": "Exportar informe",
     "srDescription": "Descarga el informe en PDF o copia un enlace compartible",
     "reportTitle": "Informe — Formación Tech — Región Metropolitana",
-    "reportMeta": "Generado el 06/23/2026 · 3 fuentes · AppBiT B2G",
+    "reportMeta": "Generado el {{date}} · {{count}} fuentes · AppBiT B2G",
     "reportFormat": "Afirmación + Evidencia + Fuentes · Formato de política pública",
     "downloadPdf": "Descargar PDF",
     "downloadPdfDesc": "Estructura de paper académico con fuentes citadas",
@@ -52,7 +52,7 @@
     "lgpd": "Exportación registrada según LGPD · Art. 7, inciso III",
     "download": "Descargar informe",
     "printDocTitle": "Informe AppBiT",
-    "printMeta": "Generado el 06/23/2026 · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
+    "printMeta": "Generado el {{date}} · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
     "printQuestion": "Pregunta",
     "printAnswer": "Respuesta",
     "printSources": "Fuentes"
