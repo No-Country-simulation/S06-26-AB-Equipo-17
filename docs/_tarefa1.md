@@ -38,8 +38,9 @@ decisões — hoje isso leva dias cruzando planilhas manualmente.
 | Mapa | **Leaflet + OpenStreetMap** | Gratuito, sem chave de API |
 | Backend | **Python 3.11+ + FastAPI + Pydantic** | pandas facilita o pipeline; docs automáticas |
 | Dados | **pandas** (DataFrame em memória) | Read-only; poucos milhares de linhas |
-| IA | **Provider-agnostic** (Gemini API) |
-| PDF | **react-to-print** | Exporta o "paper" |
+| IA | **Provider-agnostic** (Google Gemini) | Camada isolada e trocável por variável de ambiente |
+| i18n | **react-i18next** (pt-BR / en / es) | Interface trilíngue, traduções bundladas (offline-friendly) |
+| PDF | **react-to-print** | Exporta o "paper" (afirmação + tabela de evidências + fontes) |
 | Deploy | **Render** (site estático + web service) | Free tier, monorepo via `render.yaml` |
 
 ## 🏗️ Arquitetura (princípio central)
@@ -73,7 +74,7 @@ mais fontes (IBGE, DATASUS) sem refatorar.
 Monorepo no **Render** com `render.yaml`: 1 **site estático** (frontend, grátis e sem dormir)
 + 1 **web service** (backend FastAPI, free tier 750h/mês).
 
-## 👥 Equipe e frentes (6 pessoas)
+## 👥 Equipe e frentes (3 pessoas)
 
 | Frente | Responsabilidade |
 |---|---|
@@ -81,7 +82,7 @@ Monorepo no **Render** com `render.yaml`: 1 **site estático** (frontend, gráti
 | Backend / API | `/dados`, `/mapa`, `/health` (FastAPI) |
 | Agente de IA | Service (monta prompt) + gateway Gemini + formato "paper" |
 | Mapa | Visualização geográfica (Leaflet) |
-| Consulta / UI / PDF | Barra de IA, card de resultado, export PDF, responsividade |
+| Consulta / UI / PDF | Barra de IA, card de resultado, export PDF, responsividade, i18n (pt-BR/en/es) |
 | Infra / Deploy / Docs | Render, `.env`, CORS, documentação |
 
 ## 🗺️ Estrutura do repositório
