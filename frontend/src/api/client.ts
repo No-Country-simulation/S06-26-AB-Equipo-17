@@ -25,7 +25,7 @@ export class ApiError extends Error {
 const http = axios.create({
   baseURL: `${BASE_URL}/api/v1`,
   // A consulta de IA (POST /dados) demora ~20-30s
-  timeout: 45000,
+  timeout: 60000,
   headers: { "Content-Type": "application/json" },
 });
 
