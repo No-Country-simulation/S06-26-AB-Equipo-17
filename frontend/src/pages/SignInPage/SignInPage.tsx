@@ -26,8 +26,9 @@ function CheckGlyph() {
 export function SignInPage() {
   const { t } = useTranslation("signIn");
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // Credenciais mockadas (demo/hackathon) — pré-preenchem o formulário.
+  const [email, setEmail] = useState("carla.demo@appbit.gov.br");
+  const [password, setPassword] = useState("appbit2026");
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
