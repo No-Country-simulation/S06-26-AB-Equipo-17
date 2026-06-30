@@ -19,10 +19,13 @@ export function LoadingStep({ question }: LoadingStepProps) {
   const phases = t("loading.phases", { returnObjects: true });
   const phaseCount = phases.length;
 
+  // A request real demora ~20-30s. Avançamos as etapas devagar e PARAMOS na
+  // última (deixa "em andamento", não 100%) — quem encerra o loading é o
+  // useQueryFlow quando a resposta chega. Assim não parece "pronto" esperando.
   useEffect(() => {
     const id = setInterval(() => {
-      setPhaseIndex((i) => Math.min(i + 1, phaseCount));
-    }, 1200);
+      setPhaseIndex((i) => Math.min(i + 1, phaseCount - 1));
+    }, 7000);
     return () => clearInterval(id);
   }, [phaseCount]);
 
