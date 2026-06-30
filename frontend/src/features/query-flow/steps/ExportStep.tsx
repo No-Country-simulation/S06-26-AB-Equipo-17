@@ -98,8 +98,8 @@ export function ExportStep({ question, result }: ExportStepProps) {
             {t("export.printSources")}
           </p>
           {result.sources.map((source) => (
-            <p key={source} className="mt-1 text-sm text-neutral-600">
-              {source}
+            <p key={source.name} className="mt-1 text-sm text-neutral-600">
+              {source.name}
             </p>
           ))}
         </div>

@@ -5,11 +5,14 @@
    ============================================================ */
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAIQuery } from "@/api/hooks";
+import { toApiLanguage } from "@/i18n";
 import type { Step } from "./types";
 
 /** @param initialQuestion texto vindo do AIPrompt do mapa (lido na montagem). */
 export function useQueryFlow(initialQuestion = "") {
+  const { i18n } = useTranslation();
   const [step, setStep] = useState<Step>("input");
   const [question, setQuestion] = useState(initialQuestion);
   const { data: result, error, submit } = useAIQuery();
@@ -18,7 +21,8 @@ export function useQueryFlow(initialQuestion = "") {
   async function runQuery() {
     setStep("loading");
     try {
-      await submit({ question });
+      const language = toApiLanguage(i18n.resolvedLanguage ?? i18n.language);
+      await submit({ question, language });
       setStep("result");
     } catch {
       // O erro fica em `error`; por ora volta pro input. (UI de erro: TODO)

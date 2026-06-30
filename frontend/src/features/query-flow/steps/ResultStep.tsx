@@ -2,13 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { EvidenceStatus, QueryResult } from "@/types";
-
-const STATUS_COLOR: Record<EvidenceStatus, string> = {
-  critical: "bg-critical",
-  warning: "bg-warning",
-  success: "bg-success",
-};
+import type { QueryResult } from "@/types";
 
 export type ResultStepProps = {
   /** Pergunta do usuário (subtítulo). */
@@ -35,7 +29,7 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
         <Zap size={14} />
-        {t("result.meta", { time: result.responseTime, count: result.sourceCount })}
+        {t("result.meta", { time: result.responseTime, count: result.sources.length })}
       </span>
 
       {/* Afirmação principal */}
@@ -48,21 +42,19 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
           <table className="w-full text-left">
             <thead className="bg-surface-sec">
               <tr className="text-caption uppercase tracking-wide text-ink-muted">
+                <th className="px-4 py-2 font-medium">{t("result.colData")}</th>
+                <th className="px-4 py-2 font-medium">{t("result.colValue")}</th>
                 <th className="px-4 py-2 font-medium">{t("result.colRegion")}</th>
-                <th className="px-4 py-2 font-medium">{t("result.colCoverage")}</th>
-                <th className="px-4 py-2 font-medium">{t("result.colTech")}</th>
-                <th className="px-4 py-2 font-medium">{t("result.colStatus")}</th>
+                <th className="px-4 py-2 font-medium">{t("result.colPeriod")}</th>
               </tr>
             </thead>
             <tbody>
-              {result.evidence.map((row) => (
-                <tr key={row.region} className="border-t border-line text-body">
-                  <td className="px-4 py-3 font-semibold text-ink">{row.region}</td>
-                  <td className="px-4 py-3 text-ink">{row.coverage4g}</td>
-                  <td className="px-4 py-3 text-ink">{row.techTraining}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLOR[row.status]}`} />
-                  </td>
+              {result.evidence.map((row, i) => (
+                <tr key={`${row.label}-${i}`} className="border-t border-line text-body">
+                  <td className="px-4 py-3 font-semibold text-ink">{row.label}</td>
+                  <td className="px-4 py-3 text-ink tabular-nums">{row.value}</td>
+                  <td className="px-4 py-3 text-ink">{row.region}</td>
+                  <td className="px-4 py-3 text-ink-muted">{row.period}</td>
                 </tr>
               ))}
             </tbody>
@@ -74,8 +66,8 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
       <div className="space-y-1">
         <p className="text-caption uppercase tracking-wide text-ink-muted">{t("result.sources")}</p>
         {result.sources.map((source) => (
-          <p key={source} className="text-caption text-ink-muted">
-            {source}
+          <p key={source.name} className="text-caption text-ink-muted">
+            {source.name}
           </p>
         ))}
       </div>
