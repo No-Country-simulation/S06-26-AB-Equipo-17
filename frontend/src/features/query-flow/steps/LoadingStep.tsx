@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type LoadingStepProps = {
   /** Pergunta do usuário (vinda do passo anterior). */
@@ -25,7 +29,7 @@ export function LoadingStep({ question }: LoadingStepProps) {
   useEffect(() => {
     const id = setInterval(() => {
       setPhaseIndex((i) => Math.min(i + 1, phaseCount - 1));
-    }, 7000);
+    }, 4000);
     return () => clearInterval(id);
   }, [phaseCount]);
 
@@ -34,8 +38,12 @@ export function LoadingStep({ question }: LoadingStepProps) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-title-2 text-ink">{t("loading.title")}</DialogTitle>
-        <DialogDescription className="sr-only">{t("loading.srDescription")}</DialogDescription>
+        <DialogTitle className="text-title-2 text-ink">
+          {t("loading.title")}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("loading.srDescription")}
+        </DialogDescription>
       </DialogHeader>
 
       <hr className="border-line" />
@@ -75,7 +83,11 @@ export function LoadingStep({ question }: LoadingStepProps) {
               <span
                 className={`h-2.5 w-2.5 rounded-full ${done ? "bg-success" : "bg-disabled-foreground"}`}
               />
-              <span className={`text-body ${done ? "text-ink" : "text-ink-muted"}`}>{label}</span>
+              <span
+                className={`text-body ${done ? "text-ink" : "text-ink-muted"}`}
+              >
+                {label}
+              </span>
             </li>
           );
         })}
