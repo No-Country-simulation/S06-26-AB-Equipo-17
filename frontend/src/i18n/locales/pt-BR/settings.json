@@ -1,0 +1,33 @@
+{
+  "title": "Configurar Alertas",
+  "description": "Configure região, indicador, limite e notificações dos alertas",
+  "monitoredRegion": "Região monitorada",
+  "indicator": "Indicador",
+  "criticalThreshold": "Limite crítico",
+  "below": "abaixo de",
+  "notifyVia": "Notificar via",
+  "frequency": "Frequência",
+  "save": "Salvar configuração",
+  "regions": {
+    "all": "Todas as regiões",
+    "east": "Leste",
+    "southwest": "Sudoeste",
+    "center": "Centro"
+  },
+  "indicators": {
+    "coverage4g": "Cobertura 4G",
+    "techEducation": "Formação tech",
+    "employment": "Emprego",
+    "mobility": "Mobilidade"
+  },
+  "channels": {
+    "panel": "Painel AppBiT",
+    "email": "E-mail",
+    "pdf": "Relatório PDF"
+  },
+  "frequencies": {
+    "realtime": "Tempo real",
+    "hourly": "A cada hora",
+    "daily": "Diário"
+  }
+}

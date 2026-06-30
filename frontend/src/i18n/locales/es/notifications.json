@@ -1,0 +1,36 @@
+{
+  "title": "Alertas y Notificaciones",
+  "srDescription": "Centro de alertas y notificaciones del sistema",
+  "tabs": {
+    "all": "Todos",
+    "critical": "Críticos",
+    "editais": "Convocatorias",
+    "sistema": "Sistema"
+  },
+  "items": {
+    "1": {
+      "title": "Cobertura 4G crítica — Región Este",
+      "description": "22% de cobertura. Por debajo del límite mínimo regulatorio (30%).",
+      "time": "Ahora",
+      "action": "Ver en el mapa"
+    },
+    "2": {
+      "title": "Convocatoria MCTI #42/2026 vence en 18 días",
+      "description": "Justificación generada. Revisión pendiente antes del envío.",
+      "time": "Hace 2h",
+      "action": "Revisar"
+    },
+    "3": {
+      "title": "Informe de indicadores disponible",
+      "description": "Mensual jun 2026 generado. Todas las regiones incluidas.",
+      "time": "Hoy, 06:00",
+      "action": "Descargar"
+    },
+    "4": {
+      "title": "MEC #18/2026 — Justificación enviada",
+      "description": "Documento registrado con éxito. A la espera de análisis.",
+      "time": "28 jun",
+      "action": "Ver comprobante"
+    }
+  }
+}

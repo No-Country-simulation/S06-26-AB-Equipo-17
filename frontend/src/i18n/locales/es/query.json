@@ -1,0 +1,58 @@
+{
+  "input": {
+    "title": "Consulta en lenguaje natural",
+    "description": "Pregunta como le preguntarías a un asesor técnico",
+    "poweredBy": "Con tecnología de Vísent CDRView + IA",
+    "placeholder": "Ej: ¿Dónde faltan programas de formación tech en el área metropolitana?",
+    "suggestionsLabel": "Sugerencias",
+    "suggestions": [
+      "¿Qué región tiene menor cobertura 4G?",
+      "¿Dónde falta infraestructura tech?",
+      "Compara empleo y movilidad en el Este"
+    ],
+    "sourcesLabel": "Fuentes a consultar:",
+    "submit": "Enviar consulta"
+  },
+  "loading": {
+    "title": "Analizando datos...",
+    "srDescription": "Procesando tu consulta",
+    "yourQuestion": "Tu pregunta",
+    "spinnerLabel": "Cargando",
+    "crossing": "Cruzando Vísent CDRView, IBGE 2023 y Anatel ERB",
+    "phases": [
+      "Interpretando consulta",
+      "Buscando datos por región",
+      "Generando respuesta con fuentes"
+    ]
+  },
+  "result": {
+    "title": "Resultado del análisis",
+    "meta": "Respuesta en {{time}} · {{count}} fuentes consultadas",
+    "evidence": "Evidencia",
+    "colRegion": "Región",
+    "colCoverage": "Cobertura 4G",
+    "colTech": "Formación tech",
+    "colStatus": "Estado",
+    "sources": "Fuentes",
+    "exportPdf": "Exportar como PDF",
+    "refine": "Refinar consulta"
+  },
+  "export": {
+    "title": "Exportar informe",
+    "srDescription": "Descarga el informe en PDF o copia un enlace compartible",
+    "reportTitle": "Informe — Formación Tech — Región Metropolitana",
+    "reportMeta": "Generado el 06/23/2026 · 3 fuentes · AppBiT B2G",
+    "reportFormat": "Afirmación + Evidencia + Fuentes · Formato de política pública",
+    "downloadPdf": "Descargar PDF",
+    "downloadPdfDesc": "Estructura de paper académico con fuentes citadas",
+    "copyLink": "Copiar enlace compartible",
+    "copyLinkDesc": "Comparte con colegas antes de la reunión",
+    "lgpd": "Exportación registrada según LGPD · Art. 7, inciso III",
+    "download": "Descargar informe",
+    "printDocTitle": "Informe AppBiT",
+    "printMeta": "Generado el 06/23/2026 · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
+    "printQuestion": "Pregunta",
+    "printAnswer": "Respuesta",
+    "printSources": "Fuentes"
+  }
+}

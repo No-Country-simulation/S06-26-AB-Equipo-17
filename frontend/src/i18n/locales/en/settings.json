@@ -1,0 +1,33 @@
+{
+  "title": "Configure Alerts",
+  "description": "Set up region, indicator, threshold and alert notifications",
+  "monitoredRegion": "Monitored region",
+  "indicator": "Indicator",
+  "criticalThreshold": "Critical threshold",
+  "below": "below",
+  "notifyVia": "Notify via",
+  "frequency": "Frequency",
+  "save": "Save settings",
+  "regions": {
+    "all": "All regions",
+    "east": "East",
+    "southwest": "Southwest",
+    "center": "Center"
+  },
+  "indicators": {
+    "coverage4g": "4G coverage",
+    "techEducation": "Tech education",
+    "employment": "Employment",
+    "mobility": "Mobility"
+  },
+  "channels": {
+    "panel": "AppBiT panel",
+    "email": "E-mail",
+    "pdf": "PDF report"
+  },
+  "frequencies": {
+    "realtime": "Real time",
+    "hourly": "Hourly",
+    "daily": "Daily"
+  }
+}

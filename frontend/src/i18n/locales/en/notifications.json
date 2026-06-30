@@ -1,0 +1,36 @@
+{
+  "title": "Alerts & Notifications",
+  "srDescription": "System alerts and notifications center",
+  "tabs": {
+    "all": "All",
+    "critical": "Critical",
+    "editais": "Calls",
+    "sistema": "System"
+  },
+  "items": {
+    "1": {
+      "title": "Critical 4G coverage — East Region",
+      "description": "22% coverage. Below the minimum regulatory threshold (30%).",
+      "time": "Now",
+      "action": "View on map"
+    },
+    "2": {
+      "title": "MCTI Call #42/2026 expires in 18 days",
+      "description": "Justification generated. Review pending before submission.",
+      "time": "2h ago",
+      "action": "Review"
+    },
+    "3": {
+      "title": "Indicators report available",
+      "description": "June 2026 monthly generated. All regions included.",
+      "time": "Today, 06:00",
+      "action": "Download"
+    },
+    "4": {
+      "title": "MEC #18/2026 — Justification submitted",
+      "description": "Document filed successfully. Awaiting review.",
+      "time": "Jun 28",
+      "action": "View receipt"
+    }
+  }
+}

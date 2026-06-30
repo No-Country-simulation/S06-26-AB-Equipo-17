@@ -1,0 +1,58 @@
+{
+  "input": {
+    "title": "Natural language query",
+    "description": "Ask as you would ask a technical advisor",
+    "poweredBy": "Powered by Vísent CDRView + AI",
+    "placeholder": "E.g.: Where are tech education programs missing in the metropolitan area?",
+    "suggestionsLabel": "Suggestions",
+    "suggestions": [
+      "Which region has the lowest 4G coverage?",
+      "Where is tech infrastructure lacking?",
+      "Compare employment and mobility in the East"
+    ],
+    "sourcesLabel": "Sources to query:",
+    "submit": "Submit query"
+  },
+  "loading": {
+    "title": "Analyzing data...",
+    "srDescription": "Processing your query",
+    "yourQuestion": "Your question",
+    "spinnerLabel": "Loading",
+    "crossing": "Cross-referencing Vísent CDRView, IBGE 2023 and Anatel ERB",
+    "phases": [
+      "Interpreting query",
+      "Fetching data by region",
+      "Generating answer with sources"
+    ]
+  },
+  "result": {
+    "title": "Analysis result",
+    "meta": "Answer in {{time}} · {{count}} sources queried",
+    "evidence": "Evidence",
+    "colRegion": "Region",
+    "colCoverage": "4G coverage",
+    "colTech": "Tech education",
+    "colStatus": "Status",
+    "sources": "Sources",
+    "exportPdf": "Export as PDF",
+    "refine": "Refine query"
+  },
+  "export": {
+    "title": "Export report",
+    "srDescription": "Download the report as PDF or copy a shareable link",
+    "reportTitle": "Report — Tech Education — Metropolitan Region",
+    "reportMeta": "Generated on 06/23/2026 · 3 sources · AppBiT B2G",
+    "reportFormat": "Claim + Evidence + Sources · Public policy format",
+    "downloadPdf": "Download PDF",
+    "downloadPdfDesc": "Academic paper structure with cited sources",
+    "copyLink": "Copy shareable link",
+    "copyLinkDesc": "Share with colleagues before the meeting",
+    "lgpd": "Export logged per LGPD · Art. 7, item III",
+    "download": "Download report",
+    "printDocTitle": "AppBiT Report",
+    "printMeta": "Generated on 06/23/2026 · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
+    "printQuestion": "Question",
+    "printAnswer": "Answer",
+    "printSources": "Sources"
+  }
+}

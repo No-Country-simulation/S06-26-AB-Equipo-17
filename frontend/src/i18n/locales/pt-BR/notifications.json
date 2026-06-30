@@ -1,0 +1,36 @@
+{
+  "title": "Alertas e Notificações",
+  "srDescription": "Central de alertas e notificações do sistema",
+  "tabs": {
+    "all": "Todos",
+    "critical": "Críticos",
+    "editais": "Editais",
+    "sistema": "Sistema"
+  },
+  "items": {
+    "1": {
+      "title": "Cobertura 4G crítica — Região Leste",
+      "description": "22% de cobertura. Abaixo do limite mínimo regulatório (30%).",
+      "time": "Agora",
+      "action": "Ver no mapa"
+    },
+    "2": {
+      "title": "Edital MCTI #42/2026 vence em 18 dias",
+      "description": "Justificativa gerada. Revisão pendente antes do envio.",
+      "time": "2h atrás",
+      "action": "Revisar"
+    },
+    "3": {
+      "title": "Relatório de Indicadores disponível",
+      "description": "Mensal Jun 2026 gerado. Todas as regiões incluídas.",
+      "time": "Hoje, 06:00",
+      "action": "Baixar"
+    },
+    "4": {
+      "title": "MEC #18/2026 — Justificativa enviada",
+      "description": "Documento protocolado com sucesso. Aguardando análise.",
+      "time": "28 Jun",
+      "action": "Ver protocolo"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "heroTitle": "Decisões baseadas em evidência.",
+  "heroTagline": "Pergunte. Analise. Decida.",
+  "heroSubtitle": "Evidência verificável. Fontes citáveis. Decisão com respaldo em 5 minutos, não em 5 dias.",
+  "quote": "O Vísent CDRView cobre regiões com dados de mobilidade, cobertura de rede e indicadores socioeconômicos, cruzáveis em uma única consulta.",
+  "quoteAuthor": "— Time AppBiT · Hackathon B2G 2026",
+  "welcome": "Bem-vinda, {{name}}.",
+  "welcomeSubtitle": "Acesse sua conta institucional para continuar.",
+  "emailLabel": "E-mail institucional",
+  "emailPlaceholder": "nome@prefeitura.gov.br",
+  "passwordLabel": "Senha",
+  "forgotPassword": "Esqueci minha senha",
+  "signIn": "Entrar",
+  "or": "ou",
+  "signInGov": "Entrar com gov.br",
+  "restricted": "Acesso restrito a servidores públicos municipais.",
+  "hackathon": "Hackathon App BiT B2G · Jun–Jul 2026",
+  "secureConnection": "Conexão governamental segura"
+}
