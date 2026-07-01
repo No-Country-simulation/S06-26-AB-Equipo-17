@@ -12,6 +12,14 @@
       name="description"
       content="Painel de dados públicos com IA: pergunte em linguagem natural e receba evidências citáveis por região."
     />
+    <!-- iOS standalone (adicionar à tela de início): habilita o modo app e
+         mantém o conteúdo ABAIXO da status bar (status-bar-style=default →
+         sem overlap e texto da barra escuro/legível sobre a topbar branca).
+         Junto com viewport-fit=cover, faz o env(safe-area-inset-*) funcionar. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AppBiT" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <title>AppBiT — Decisões baseadas em evidência</title>
   </head>
