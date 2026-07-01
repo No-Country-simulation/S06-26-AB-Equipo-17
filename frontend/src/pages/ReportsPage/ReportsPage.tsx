@@ -13,7 +13,7 @@ export function ReportsPage() {
   const { t } = useTranslation("reports");
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-start gap-5 lg:grid-cols-[2fr_1fr]">
         {/* Coluna principal — lista + justificativas empilhadas */}
         <div className="flex flex-col gap-5">
