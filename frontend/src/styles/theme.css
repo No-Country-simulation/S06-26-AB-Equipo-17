@@ -17,6 +17,44 @@ body {
   font-family: var(--font-sans);
 }
 
+/* ---- Safe areas (notch/home indicator do iPhone) ----
+   Requer `viewport-fit=cover` no index.html. Em navegador normal o inset é 0
+   (inócuo); só "acende" no PWA standalone / recorte da tela. */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+/* Altura da bottom nav (56px) + inset inferior — reserva de espaço no <main>. */
+@utility pb-bottom-nav {
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+}
+
+/* ---- Movimento reduzido (a11y) ----
+   Respeita quem pediu menos animação no SO (iOS/Android/desktop): neutraliza
+   animações/transições (spinner e barra do LoadingStep, transições dos Dialogs
+   do tw-animate, etc.) sem quebrar o layout. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Controle de zoom (+/-) do Leaflet — escondido no mobile: a pinça e o
+   duplo-toque já dão zoom, e o controle brigava com a barra de filtros no
+   topo. Reaparece em md+ (desktop, onde não há gesto de pinça). */
+@media (max-width: 767px) {
+  .leaflet-control-zoom {
+    display: none;
+  }
+}
+
 /* Tooltip do mapa que carrega o RegionKpiCard (hover dos bairros):
    remove a "caixa" padrão do Leaflet (fundo/borda/sombra/seta/padding)
    p/ mostrar só o card, com seu próprio estilo. */
@@ -41,13 +79,21 @@ body {
   pointer-events: none;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 11px;
+  /* Tamanho dirigido pelo zoom (BairroLabelZoom escreve --bairro-label-size no
+     container). Fallback 11px antes do 1º cálculo / se o JS não rodar. */
+  font-size: var(--bairro-label-size, 11px);
   line-height: 1;
   color: var(--color-ink);
   text-shadow:
     0 0 3px #fff,
     0 0 3px #fff,
     0 0 2px #fff;
+}
+
+/* Limiar de zoom (mobile): esconde os nomes dos bairros na visão geral p/ não
+   amontoar; reaparecem ao aproximar. A classe fica no container do mapa. */
+.bairro-labels-hidden .leaflet-marker-icon.bairro-label {
+  display: none;
 }
 
 /* ---- Fundo do painel escuro (auth/hero) — navy + glows radiais azuis ----
