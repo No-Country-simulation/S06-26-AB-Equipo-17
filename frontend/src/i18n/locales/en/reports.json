@@ -1,0 +1,58 @@
+{
+  "myReports": {
+    "title": "My Reports",
+    "new": "New report",
+    "recent": "Recently generated",
+    "download": "Download",
+    "generating": "Generating...",
+    "items": {
+      "jun2026": { "title": "Indicators Jun 2026", "subtitle": "Monthly · all regions", "date": "Today" },
+      "compMaiJun": { "title": "Comparison May–Jun", "subtitle": "Trend by region", "date": "30 Jun" },
+      "vulnerability": { "title": "Social Vulnerability", "subtitle": "Quarterly · Q2 2026", "date": "28 Jun" },
+      "coverage": { "title": "Network Coverage", "subtitle": "Florianópolis · Anatel", "date": "—" },
+      "mai2026": { "title": "Indicators May 2026", "subtitle": "Monthly · all regions", "date": "02 Jun" },
+      "compAbrMai": { "title": "Comparison Apr–May", "subtitle": "Trend by region", "date": "31 May" }
+    }
+  },
+  "justifications": {
+    "title": "Grant Justifications",
+    "count": "{{n}} open grants",
+    "export": "Export",
+    "deadline": "Deadline: {{n}} days",
+    "status": {
+      "generated": "Justification generated",
+      "reviewing": "Under review",
+      "waiting": "Awaiting data"
+    },
+    "items": {
+      "mcti": { "code": "MCTI #42/2026", "title": "Digital Connectivity — East Region" },
+      "mec": { "code": "MEC #18/2026", "title": "IT Training — North, East and South" },
+      "snas": { "code": "SNAS #07/2026", "title": "Social Protection — Mainland" }
+    }
+  },
+  "generator": {
+    "title": "Generate Report",
+    "fields": {
+      "region": {
+        "label": "Region",
+        "options": ["All regions", "Center", "North", "East", "South", "Mainland"]
+      },
+      "period": {
+        "label": "Period",
+        "options": ["June 2026", "May 2026", "April 2026"]
+      },
+      "indicators": {
+        "label": "Indicators",
+        "options": ["All indicators", "4G Coverage", "Vulnerability", "Employability"]
+      }
+    },
+    "format": "Format",
+    "preview": {
+      "title": "Preview",
+      "text": "5 regions · 30 indicators · ~4 pages"
+    },
+    "generate": "Generate Report",
+    "recent": "Recent",
+    "recents": ["25 Jun · East · Connectivity", "20 Jun · All · Monthly"]
+  }
+}

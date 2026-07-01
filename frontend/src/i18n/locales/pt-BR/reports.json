@@ -1,0 +1,58 @@
+{
+  "myReports": {
+    "title": "Meus Relatórios",
+    "new": "Novo relatório",
+    "recent": "Gerados recentemente",
+    "download": "Baixar",
+    "generating": "Gerando...",
+    "items": {
+      "jun2026": { "title": "Indicadores Jun 2026", "subtitle": "Mensal · todas as regiões", "date": "Hoje" },
+      "compMaiJun": { "title": "Comparativo Mai–Jun", "subtitle": "Evolução por região", "date": "30 Jun" },
+      "vulnerability": { "title": "Vulnerabilidade Social", "subtitle": "Trimestral · T2 2026", "date": "28 Jun" },
+      "coverage": { "title": "Cobertura de Rede", "subtitle": "Florianópolis · Anatel", "date": "—" },
+      "mai2026": { "title": "Indicadores Mai 2026", "subtitle": "Mensal · todas as regiões", "date": "02 Jun" },
+      "compAbrMai": { "title": "Comparativo Abr–Mai", "subtitle": "Evolução por região", "date": "31 Mai" }
+    }
+  },
+  "justifications": {
+    "title": "Justificativas de Editais",
+    "count": "{{n}} editais abertos",
+    "export": "Exportar",
+    "deadline": "Prazo: {{n}} dias",
+    "status": {
+      "generated": "Justificativa gerada",
+      "reviewing": "Em revisão",
+      "waiting": "Aguardando dados"
+    },
+    "items": {
+      "mcti": { "code": "MCTI #42/2026", "title": "Conectividade Digital — Região Leste" },
+      "mec": { "code": "MEC #18/2026", "title": "Formação em TI — Norte, Leste e Sul" },
+      "snas": { "code": "SNAS #07/2026", "title": "Proteção Social — Continente" }
+    }
+  },
+  "generator": {
+    "title": "Gerar Relatório",
+    "fields": {
+      "region": {
+        "label": "Região",
+        "options": ["Todas as regiões", "Centro", "Norte", "Leste", "Sul", "Continente"]
+      },
+      "period": {
+        "label": "Período",
+        "options": ["Junho 2026", "Maio 2026", "Abril 2026"]
+      },
+      "indicators": {
+        "label": "Indicadores",
+        "options": ["Todos os indicadores", "Cobertura 4G", "Vulnerabilidade", "Empregabilidade"]
+      }
+    },
+    "format": "Formato",
+    "preview": {
+      "title": "Prévia",
+      "text": "5 regiões · 30 indicadores · ~4 pág."
+    },
+    "generate": "Gerar Relatório",
+    "recent": "Recentes",
+    "recents": ["25 Jun · Leste · Conectividade", "20 Jun · Todas · Mensal"]
+  }
+}

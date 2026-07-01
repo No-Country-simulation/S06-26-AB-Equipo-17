@@ -1,0 +1,58 @@
+{
+  "myReports": {
+    "title": "Mis Informes",
+    "new": "Nuevo informe",
+    "recent": "Generados recientemente",
+    "download": "Descargar",
+    "generating": "Generando...",
+    "items": {
+      "jun2026": { "title": "Indicadores Jun 2026", "subtitle": "Mensual · todas las regiones", "date": "Hoy" },
+      "compMaiJun": { "title": "Comparativo May–Jun", "subtitle": "Evolución por región", "date": "30 Jun" },
+      "vulnerability": { "title": "Vulnerabilidad Social", "subtitle": "Trimestral · T2 2026", "date": "28 Jun" },
+      "coverage": { "title": "Cobertura de Red", "subtitle": "Florianópolis · Anatel", "date": "—" },
+      "mai2026": { "title": "Indicadores May 2026", "subtitle": "Mensual · todas las regiones", "date": "02 Jun" },
+      "compAbrMai": { "title": "Comparativo Abr–May", "subtitle": "Evolución por región", "date": "31 May" }
+    }
+  },
+  "justifications": {
+    "title": "Justificaciones de Convocatorias",
+    "count": "{{n}} convocatorias abiertas",
+    "export": "Exportar",
+    "deadline": "Plazo: {{n}} días",
+    "status": {
+      "generated": "Justificación generada",
+      "reviewing": "En revisión",
+      "waiting": "Esperando datos"
+    },
+    "items": {
+      "mcti": { "code": "MCTI #42/2026", "title": "Conectividad Digital — Región Este" },
+      "mec": { "code": "MEC #18/2026", "title": "Formación en TI — Norte, Este y Sur" },
+      "snas": { "code": "SNAS #07/2026", "title": "Protección Social — Continente" }
+    }
+  },
+  "generator": {
+    "title": "Generar Informe",
+    "fields": {
+      "region": {
+        "label": "Región",
+        "options": ["Todas las regiones", "Centro", "Norte", "Este", "Sur", "Continente"]
+      },
+      "period": {
+        "label": "Período",
+        "options": ["Junio 2026", "Mayo 2026", "Abril 2026"]
+      },
+      "indicators": {
+        "label": "Indicadores",
+        "options": ["Todos los indicadores", "Cobertura 4G", "Vulnerabilidad", "Empleabilidad"]
+      }
+    },
+    "format": "Formato",
+    "preview": {
+      "title": "Vista previa",
+      "text": "5 regiones · 30 indicadores · ~4 pág."
+    },
+    "generate": "Generar Informe",
+    "recent": "Recientes",
+    "recents": ["25 Jun · Este · Conectividad", "20 Jun · Todas · Mensual"]
+  }
+}
