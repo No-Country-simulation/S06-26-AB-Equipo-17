@@ -1,9 +1,9 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useTranslation } from "react-i18next";
-import { GeoJSON, MapContainer, Marker, TileLayer } from "react-leaflet";
+import { GeoJSON, MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import type { FeatureCollection } from "geojson";
 import { AIPrompt } from "../../components/AIPrompt";
 import { MapFilterBar, type MapFilterItem } from "../../components/MapFilterBar";
@@ -66,6 +66,45 @@ const REGION_KPIS = indexByName(
 const THEME_VALUES = ["overview", "education", "health", "housing", "employment"] as const;
 
 /**
+ * Controla os rótulos dos bairros conforme o zoom (deve viver dentro do
+ * <MapContainer> p/ acessar o `useMap`). CSS puro não enxerga o zoom do
+ * Leaflet, então dirigimos por JS escrevendo no container do mapa:
+ *  - `--bairro-label-size`: tamanho do texto = clamp(8, 11 + Δzoom×1.5, 16)px
+ *    → afastado fica menor (menos sobreposição), aproximado fica maior.
+ *  - classe `.bairro-labels-hidden`: no MOBILE, some com os 56 nomes na visão
+ *    geral (evita o amontoado do print) e só reaparecem ao aproximar 2 níveis.
+ *    No desktop os rótulos ficam sempre visíveis (há espaço).
+ *  Base = zoom inicial (o mapa abre via `bounds`, então getZoom() é o "fit").
+ */
+function BairroLabelZoom() {
+  const map = useMap();
+  const baseZoomRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const el = map.getContainer();
+    if (baseZoomRef.current === null) baseZoomRef.current = map.getZoom();
+    const base = baseZoomRef.current;
+
+    const update = () => {
+      const zoom = map.getZoom();
+      const size = Math.max(8, Math.min(16, 11 + (zoom - base) * 1.5));
+      el.style.setProperty("--bairro-label-size", `${size}px`);
+      // Limiar só no mobile (<768px); desktop nunca esconde.
+      const isMobile = window.innerWidth < 768;
+      el.classList.toggle("bairro-labels-hidden", isMobile && zoom < base + 2);
+    };
+
+    update();
+    map.on("zoomend", update);
+    return () => {
+      map.off("zoomend", update);
+    };
+  }, [map]);
+
+  return null;
+}
+
+/**
  * Tela inicial do app — mapa temático de Florianópolis: basemap claro sem
  * rótulos + bairros coloridos em tons pastel. O prompt da IA fica sobreposto.
  *
@@ -88,6 +127,21 @@ export function MapPage() {
     value,
     label: t(`themes.${value}`),
   }));
+
+  // Legenda montada uma vez e reutilizada em dois pontos (canto no desktop /
+  // acima do prompt no tablet); só um deles fica visível por breakpoint.
+  const legend = (
+    <Legend
+      className="pointer-events-auto"
+      title={t("legend.title")}
+      items={[
+        { tone: "success", label: t("legend.fullCoverage") },
+        { tone: "info", label: t("legend.monitoring") },
+        { tone: "orange", label: t("legend.highCriticality") },
+        { tone: "critical", label: t("legend.noCoverage") },
+      ]}
+    />
+  );
 
   return (
     <div className="relative isolate z-0 min-h-0 w-full flex-1">
@@ -130,11 +184,14 @@ export function MapPage() {
         {BAIRRO_LABELS.map((b) => (
           <Marker key={b.name} position={b.center} icon={b.icon} interactive={false} />
         ))}
+
+        {/* Ajusta tamanho/visibilidade dos rótulos conforme o zoom. */}
+        <BairroLabelZoom />
       </MapContainer>
 
       {/* Filtros temáticos sobrepostos — topo, centralizados. Mesma lógica de
           pointer-events do prompt: overlay não captura, faixa captura. */}
-      <div className="pointer-events-none absolute inset-x-0 top-8 z-[1000] flex justify-center px-4">
+      <div className="pointer-events-none absolute inset-x-0 top-4 z-[1000] flex justify-center px-4 md:top-8">
         <MapFilterBar
           className="pointer-events-auto max-w-full"
           aria-label={t("filterLabel")}
@@ -144,24 +201,20 @@ export function MapPage() {
         />
       </div>
 
-      {/* Legenda flutuante — parte superior-esquerda, deslocada p/ o centro. */}
-      <div className="pointer-events-none absolute left-24 top-24 z-[1000]">
-        <Legend
-          className="pointer-events-auto"
-          title={t("legend.title")}
-          items={[
-            { tone: "success", label: t("legend.fullCoverage") },
-            { tone: "info", label: t("legend.monitoring") },
-            { tone: "orange", label: t("legend.highCriticality") },
-            { tone: "critical", label: t("legend.noCoverage") },
-          ]}
-        />
+      {/* Legenda no DESKTOP (lg+) — ancorada no canto inferior-esquerdo, flush.
+          Há espaço de sobra; o prompt centralizado não colide. */}
+      <div className="pointer-events-none absolute bottom-8 left-4 z-[1000] hidden lg:block">
+        {legend}
       </div>
 
-      {/* Prompt da IA sobreposto — centralizado, deslocado do rodapé.
-          pointer-events-none no overlay deixa o mapa arrastável ao redor;
-          z acima dos panes/controls do Leaflet. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-8 z-[1000] flex justify-center px-4">
+      {/* Faixa inferior — prompt da IA; no TABLET (md) a legenda vem acima dele,
+          na MESMA coluna centralizada (max-w-2xl) → compartilham a borda
+          esquerda. No desktop essa cópia some (vai pro canto acima); no mobile
+          some de vez. pointer-events-none no overlay deixa o mapa arrastável. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[1000] flex flex-col items-center gap-3 px-4 md:bottom-8">
+        {/* Legenda — só no tablet (md); escondida no mobile e no desktop (lg). */}
+        <div className="hidden w-full max-w-2xl md:flex lg:hidden">{legend}</div>
+
         <div className="pointer-events-auto w-full max-w-2xl">
           <AIPrompt
             value={prompt}
