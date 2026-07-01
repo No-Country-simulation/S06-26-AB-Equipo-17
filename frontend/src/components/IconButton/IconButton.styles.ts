@@ -1,6 +1,6 @@
 /* ============================================================
    IconButton — ESTILO (estrutura fixa, igual em todos os estados)
-   Botão de ícone · 40×40. Variações por estado em
+   Botão de ícone · 44×44 (mobile) / 40×40 (md+). Variações por estado em
    ./IconButton.states.ts.
    ============================================================ */
 
@@ -12,7 +12,7 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
 export const styles = {
   /** Container 40×40 — ícone centralizado. Cor/raio vêm da variante+estado. */
   root: cx(
-    'inline-flex h-10 w-10 items-center justify-center transition-colors',
+    'inline-flex size-11 items-center justify-center transition-colors md:size-10',
     'outline-none focus-visible:ring-2 focus-visible:ring-primary/60',
   ),
 } as const
