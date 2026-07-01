@@ -1,6 +1,7 @@
 import { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { BottomNav } from "../components/BottomNav";
 import { IconButton } from "../components/IconButton";
 import { Logo } from "../components/Logo";
 import { SideAppBar, type SideNavItem } from "../components/SideAppBar";
@@ -26,7 +27,7 @@ const MOCK_USER = { name: "Carla Mendes" };
  * sidebar + conteúdo da rota (<Outlet/>).
  */
 export function AppLayout() {
-  const { t } = useTranslation("nav");
+  const { t } = useTranslation(["nav", "common"]);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -42,6 +43,14 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-app">
+      {/* Skip-link — primeiro elemento focável; visível só ao receber foco (teclado). */}
+      <a
+        href="#main-content"
+        className="sr-only rounded-btn-sm bg-primary px-4 py-2 text-body text-ink-inverse focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
+      >
+        {t("common:skipToContent")}
+      </a>
+
       <TopAppBar
         brand={<Logo variant="dark" className="h-7 w-auto" />}
         title={current?.label}
@@ -63,8 +72,8 @@ export function AppLayout() {
       />
 
       <div className="flex flex-1">
-        {/* Coluna branca da sidebar — card de menu centralizado verticalmente */}
-        <aside className="flex w-40 items-center justify-center bg-surface px-4">
+        {/* Coluna branca da sidebar — só em telas médias+; no mobile vira BottomNav. */}
+        <aside className="hidden w-40 items-center justify-center bg-surface px-4 md:flex">
           <SideAppBar
             items={nav}
             activeValue={current?.value ?? ""}
@@ -72,11 +81,26 @@ export function AppLayout() {
           />
         </aside>
 
-        <main className="flex min-h-0 flex-1 flex-col">
+        {/* Reserva espaço no rodapé (pb-bottom-nav) só no mobile, p/ o conteúdo
+            não ficar atrás da BottomNav fixa. */}
+        <main
+          id="main-content"
+          className="flex min-h-0 flex-1 flex-col pb-bottom-nav md:pb-0"
+        >
           <Suspense fallback={<PageFallback />}>
             <Outlet />
           </Suspense>
         </main>
+      </div>
+
+      {/* Navegação inferior — só mobile (wrapper md:hidden). */}
+      <div className="md:hidden">
+        <BottomNav
+          items={nav}
+          activeValue={current?.value ?? ""}
+          onNavigate={(value) => navigate(value)}
+          aria-label={t("common:mainNav")}
+        />
       </div>
 
       <NotificationsPanel open={notificationsOpen} onOpenChange={setNotificationsOpen} />
