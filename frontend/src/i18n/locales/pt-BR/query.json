@@ -51,6 +51,7 @@
     "copyLinkDesc": "Compartilhe com colegas antes da reunião",
     "lgpd": "Exportação registrada conforme LGPD · Art. 7º, inciso III",
     "download": "Baixar relatório",
+    "generating": "Gerando PDF...",
     "printDocTitle": "Relatório AppBiT",
     "printMeta": "Gerado em {{date}} · AppBiT B2G · Vísent CDRView + IBGE 2023 + Anatel",
     "printQuestion": "Pergunta",
