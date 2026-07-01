@@ -23,17 +23,20 @@ export function LoadingStep({ question }: LoadingStepProps) {
   const phases = t("loading.phases", { returnObjects: true });
   const phaseCount = phases.length;
 
-  // A request real demora ~20-30s. Avançamos as etapas devagar e PARAMOS na
-  // última (deixa "em andamento", não 100%) — quem encerra o loading é o
-  // useQueryFlow quando a resposta chega. Assim não parece "pronto" esperando.
+  // A request real demora ~20-30s. Avançamos as etapas e PARAMOS na última,
+  // que fica "ativa" (em andamento) — nunca marcada como concluída — até o
+  // useQueryFlow encerrar o loading quando a resposta chega. Assim a última
+  // etapa É alcançada visualmente (ativa), sem parecer "pronto" esperando.
   useEffect(() => {
     const id = setInterval(() => {
       setPhaseIndex((i) => Math.min(i + 1, phaseCount - 1));
-    }, 4000);
+    }, 2000);
     return () => clearInterval(id);
   }, [phaseCount]);
 
-  const progress = (phaseIndex / phaseCount) * 100;
+  // A etapa atual conta "meia" (em andamento) → a barra não crava 100% antes
+  // da resposta chegar, mas reflete que a última etapa já está rodando.
+  const progress = ((phaseIndex + 0.5) / phaseCount) * 100;
 
   return (
     <>
@@ -77,15 +80,16 @@ export function LoadingStep({ question }: LoadingStepProps) {
 
       <ul className="space-y-2">
         {phases.map((label, index) => {
-          const done = index < phaseIndex;
+          const done = index < phaseIndex; // concluída → verde
+          const active = index === phaseIndex; // em andamento → azul pulsante
           return (
             <li key={label} className="flex items-center gap-2">
               <span
-                className={`h-2.5 w-2.5 rounded-full ${done ? "bg-success" : "bg-disabled-foreground"}`}
+                className={`h-2.5 w-2.5 rounded-full ${
+                  done ? "bg-success" : active ? "animate-pulse bg-primary" : "bg-disabled-foreground"
+                }`}
               />
-              <span
-                className={`text-body ${done ? "text-ink" : "text-ink-muted"}`}
-              >
+              <span className={`text-body ${done || active ? "text-ink" : "text-ink-muted"}`}>
                 {label}
               </span>
             </li>
