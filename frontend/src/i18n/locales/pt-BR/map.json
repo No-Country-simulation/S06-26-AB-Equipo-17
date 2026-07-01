@@ -1,0 +1,20 @@
+{
+  "filterLabel": "Filtros do mapa",
+  "themes": {
+    "overview": "Visão Geral",
+    "education": "Educação",
+    "health": "Saúde",
+    "housing": "Habitação",
+    "employment": "Emprego"
+  },
+  "legend": {
+    "title": "Camadas ativas",
+    "fullCoverage": "Cobertura total",
+    "monitoring": "Em monitoramento",
+    "highCriticality": "Alta criticidade",
+    "noCoverage": "Sem cobertura"
+  },
+  "hover": {
+    "label": "Total de Residentes Atendidos"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "filterLabel": "Filtros del mapa",
+  "themes": {
+    "overview": "Visión General",
+    "education": "Educación",
+    "health": "Salud",
+    "housing": "Vivienda",
+    "employment": "Empleo"
+  },
+  "legend": {
+    "title": "Capas activas",
+    "fullCoverage": "Cobertura total",
+    "monitoring": "En monitoreo",
+    "highCriticality": "Alta criticidad",
+    "noCoverage": "Sin cobertura"
+  },
+  "hover": {
+    "label": "Total de Residentes Atendidos"
+  }
+}

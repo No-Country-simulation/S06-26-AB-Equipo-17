@@ -1,0 +1,20 @@
+{
+  "filterLabel": "Map filters",
+  "themes": {
+    "overview": "Overview",
+    "education": "Education",
+    "health": "Health",
+    "housing": "Housing",
+    "employment": "Employment"
+  },
+  "legend": {
+    "title": "Active layers",
+    "fullCoverage": "Full coverage",
+    "monitoring": "Monitoring",
+    "highCriticality": "High criticality",
+    "noCoverage": "No coverage"
+  },
+  "hover": {
+    "label": "Total Residents Served"
+  }
+}

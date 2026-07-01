@@ -1,0 +1,70 @@
+{
+  "agent": {
+    "title": "AppBiT Agent",
+    "status": "Online",
+    "label": "Residents monitored",
+    "sources": "Vísent CDRView + IBGE + Anatel",
+    "items": {
+      "justifications": "3 justifications ready for review",
+      "leste4g": "East without 4G — MCTI grant linked",
+      "report": "Jun 2026 report ready to download"
+    }
+  },
+  "coverage": {
+    "label": "4G coverage · Florianópolis",
+    "source": "Anatel · Jun 2026"
+  },
+  "trend": {
+    "thisMonth": "this month"
+  },
+  "lineChart": {
+    "title": "Region Summary",
+    "subtitle": "Florianópolis · Overview",
+    "actions": {
+      "attach": "Attach",
+      "report": "Report",
+      "inspect": "Inspect",
+      "compare": "Compare"
+    }
+  },
+  "regions": {
+    "title": "Indicators by Region",
+    "subtitle": "Florianópolis · 4G Coverage, Social Vulnerability, Employability",
+    "series": {
+      "coverage": "4G Coverage",
+      "vulnerability": "Vulnerability",
+      "employability": "Employability"
+    },
+    "names": {
+      "center": "Center",
+      "north": "North",
+      "east": "East",
+      "south": "South",
+      "mainland": "Mainland"
+    }
+  },
+  "opportunities": {
+    "title": "Federal Grants",
+    "count": "{{n}} opportunities",
+    "deadline": "{{n}} days",
+    "status": {
+      "generated": "Justification generated",
+      "analyzing": "Under review",
+      "waitingIbge": "Awaiting IBGE"
+    },
+    "items": {
+      "connectivity": {
+        "title": "Rural Digital Connectivity",
+        "subtitle": "East qualifies automatically"
+      },
+      "techEducation": {
+        "title": "Tech Education",
+        "subtitle": "3 regions qualify"
+      },
+      "socialProtection": {
+        "title": "Social Protection",
+        "subtitle": "Mainland qualifies"
+      }
+    }
+  }
+}

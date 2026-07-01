@@ -1,0 +1,70 @@
+{
+  "agent": {
+    "title": "Agente AppBiT",
+    "status": "En línea",
+    "label": "Residentes monitoreados",
+    "sources": "Vísent CDRView + IBGE + Anatel",
+    "items": {
+      "justifications": "3 justificaciones listas para revisión",
+      "leste4g": "Este sin 4G — convocatoria MCTI vinculada",
+      "report": "Informe jun 2026 listo para descargar"
+    }
+  },
+  "coverage": {
+    "label": "Cobertura 4G · Florianópolis",
+    "source": "Anatel · Jun 2026"
+  },
+  "trend": {
+    "thisMonth": "este mes"
+  },
+  "lineChart": {
+    "title": "Resumen de la Región",
+    "subtitle": "Florianópolis · Visión General",
+    "actions": {
+      "attach": "Adjuntar",
+      "report": "Informe",
+      "inspect": "Inspeccionar",
+      "compare": "Comparar"
+    }
+  },
+  "regions": {
+    "title": "Indicadores por Región",
+    "subtitle": "Florianópolis · Cobertura 4G, Vulnerabilidad Social, Empleabilidad",
+    "series": {
+      "coverage": "Cobertura 4G",
+      "vulnerability": "Vulnerabilidad",
+      "employability": "Empleabilidad"
+    },
+    "names": {
+      "center": "Centro",
+      "north": "Norte",
+      "east": "Este",
+      "south": "Sur",
+      "mainland": "Continente"
+    }
+  },
+  "opportunities": {
+    "title": "Convocatorias Federales",
+    "count": "{{n}} oportunidades",
+    "deadline": "{{n}} días",
+    "status": {
+      "generated": "Justificación generada",
+      "analyzing": "En análisis",
+      "waitingIbge": "Esperando IBGE"
+    },
+    "items": {
+      "connectivity": {
+        "title": "Conectividad Digital Rural",
+        "subtitle": "Este califica automáticamente"
+      },
+      "techEducation": {
+        "title": "Formación en Tecnología",
+        "subtitle": "3 regiones califican"
+      },
+      "socialProtection": {
+        "title": "Protección Social",
+        "subtitle": "Continente califica"
+      }
+    }
+  }
+}
