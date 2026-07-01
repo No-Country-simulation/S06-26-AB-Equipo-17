@@ -1,6 +1,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { GeoJSON, MapContainer, TileLayer } from "react-leaflet";
 import type { FeatureCollection } from "geojson";
 import { AIPrompt } from "../../components/AIPrompt";
@@ -29,15 +30,9 @@ const BAIRROS = bairros as FeatureCollection;
  *  dados é mais robusto que center/zoom fixos — abre sempre enquadrado em Floripa. */
 const BOUNDS = L.geoJSON(BAIRROS).getBounds();
 
-/** Temas do mapa (filtro client-side; o `/mapa` traz tudo).
- *  TODO(i18n): mover rótulos p/ um namespace de mapa quando houver. */
-const THEMES: MapFilterItem[] = [
-  { value: "overview", label: "Visão Geral" },
-  { value: "education", label: "Educação" },
-  { value: "health", label: "Saúde" },
-  { value: "housing", label: "Habitação" },
-  { value: "employment", label: "Emprego" },
-];
+/** Temas do mapa (filtro client-side; o `/mapa` traz tudo). Os rótulos vêm
+ *  do i18n (namespace `map`) — ver `themes.*`. */
+const THEME_VALUES = ["overview", "education", "health", "housing", "employment"] as const;
 
 /**
  * Tela inicial do app — mapa temático de Florianópolis: basemap claro sem
@@ -55,6 +50,13 @@ export function MapPage() {
   // Tema selecionado — filtra os dados do mapa no cliente (TODO: aplicar quando
   // o contrato do /mapa expor o campo de tema/indicador).
   const [theme, setTheme] = useState("overview");
+
+  const { t } = useTranslation("map");
+  // Rótulos dos temas vêm do i18n; reconstroem ao trocar de idioma.
+  const themes: MapFilterItem[] = THEME_VALUES.map((value) => ({
+    value,
+    label: t(`themes.${value}`),
+  }));
 
   return (
     <div className="relative isolate z-0 min-h-0 w-full flex-1">
@@ -86,10 +88,10 @@ export function MapPage() {
       <div className="pointer-events-none absolute inset-x-0 top-8 z-[1000] flex justify-center px-4">
         <MapFilterBar
           className="pointer-events-auto max-w-full"
-          aria-label="Filtros do mapa"
+          aria-label={t("filterLabel")}
           value={theme}
           onChange={setTheme}
-          items={THEMES}
+          items={themes}
         />
       </div>
 

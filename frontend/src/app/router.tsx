@@ -15,6 +15,9 @@ const SignInPage = lazy(() =>
 const MapPage = lazy(() =>
   import("../pages/MapPage").then((m) => ({ default: m.MapPage })),
 );
+const AnalyticsPage = lazy(() =>
+  import("../pages/AnalyticsPage").then((m) => ({ default: m.AnalyticsPage })),
+);
 
 /** Envolve um elemento lazy no Suspense (fallback de carregamento). */
 const suspense = (node: ReactNode) => <Suspense fallback={<PageFallback />}>{node}</Suspense>;
@@ -32,7 +35,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="map" replace /> },
       { path: "map", element: <MapPage /> },
-      { path: "analytics", element: <PlaceholderPage titleKey="analytics" /> },
+      { path: "analytics", element: <AnalyticsPage /> },
       { path: "reports", element: <PlaceholderPage titleKey="reports" /> },
       { path: "alerts", element: <PlaceholderPage titleKey="alerts" /> },
     ],

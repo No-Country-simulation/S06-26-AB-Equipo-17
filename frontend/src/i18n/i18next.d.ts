@@ -5,6 +5,8 @@ import type signIn from "./locales/pt-BR/signIn.json";
 import type settings from "./locales/pt-BR/settings.json";
 import type query from "./locales/pt-BR/query.json";
 import type notifications from "./locales/pt-BR/notifications.json";
+import type analytics from "./locales/pt-BR/analytics.json";
+import type map from "./locales/pt-BR/map.json";
 
 /** Tipa as chaves de tradução → o `tsc -b` quebra em chave inexistente (pt-BR = fonte). */
 declare module "i18next" {
@@ -17,6 +19,8 @@ declare module "i18next" {
       settings: typeof settings;
       query: typeof query;
       notifications: typeof notifications;
+      analytics: typeof analytics;
+      map: typeof map;
     };
   }
 }
