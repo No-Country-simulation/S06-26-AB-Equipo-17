@@ -258,3 +258,29 @@ no `dist/` no build (hash/cache). Fonte variável = todos os pesos com um arquiv
   começar com `"Inter Variable"`, senão renderiza em `system-ui` silenciosamente.
 - O import side-effect precisa de **`declare module "@fontsource-variable/inter"`** em
   `src/vite-env.d.ts`, senão o **`tsc -b`** do `npm run build` quebra (o `dev` não pega).
+
+## ADR-018 — Export de PDF: @react-pdf/renderer + Web Share (PWA-safe)
+**Data:** 2026-07-01 · **Status:** Aceito (substitui a escolha inicial de `react-to-print`)
+
+**Contexto:** o "paper" (ADR-005) é exportável em PDF. A 1ª implementação usava **`react-to-print`**
+(`window.print()` num iframe). Mas o app é **PWA** (ADR-009) e precisa rodar no mobile: `window.print()`
+**falha silenciosamente no PWA standalone do iOS** (o botão Exportar simplesmente não fazia nada quando o
+app estava "na tela de início").
+
+**Decisão:** gerar o PDF **no cliente como `Blob`** com **`@react-pdf/renderer`** (`ReportDocument`,
+em `features/query-flow/`) e entregar via helper **`exportPdf`** (`src/libs/exportPdf.ts`):
+**Web Share API nível 2** (`navigator.share({ files })`) no mobile/PWA → share sheet nativo
+("Salvar em Arquivos", imprimir, enviar); **fallback de download** (`<a download>`) no desktop/Android.
+`react-to-print` **removido**.
+
+**Motivos:** caminho único cross-platform, **sem depender de `window.print()`**; PDF **vetorial real**
+(texto selecionável) em vez de diálogo/screenshot; funciona em iOS/Android PWA standalone. O `@react-pdf`
+(~480 KB gzip) é **lazy** (`import()` dinâmico no `handleExport`) → fica **fora do bundle inicial** (chunk próprio).
+
+**Trade-offs / pegadinhas:**
+- **Desktop muda de UX:** antes abria o diálogo de impressão ("Salvar como PDF"); agora **baixa o `.pdf`
+  direto**. (Se quiser manter o diálogo no desktop, bifurcar por `display-mode: standalone`/mobile.)
+- `@react-pdf` usa **layout próprio** (subset de flexbox), não reaproveita JSX/Tailwind → o `ReportDocument`
+  é reescrito com as primitivas dele; fonte **Helvetica** built-in (não registra Inter).
+- Descartados: **html2canvas/html2pdf** (vira imagem, texto não selecionável); **manter react-to-print**
+  (quebra no iOS PWA); Web Share cancelado pelo usuário (`AbortError`) é tratado como no-op (não cai no download).
