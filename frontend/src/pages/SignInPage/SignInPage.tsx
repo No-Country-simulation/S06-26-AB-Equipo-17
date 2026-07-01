@@ -37,21 +37,24 @@ export function SignInPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      {/* ---- Painel esquerdo (hero) ---- */}
-      <aside className="bg-hero-navy hidden flex-col justify-between p-12 text-ink-inverse lg:flex">
+      {/* ---- Painel esquerdo (hero) ----
+          Mobile: 1ª dobra (splash) — centralizado p/ ficar longe do notch.
+          Desktop: coluna esquerda com logo (topo) · título (meio) · citação (base). */}
+      <aside className="flex min-h-screen flex-col justify-center gap-10 bg-hero-navy p-8 text-ink-inverse lg:min-h-0 lg:justify-between lg:gap-0 lg:p-12">
         <div>
           <Logo className="h-9 w-auto" />
         </div>
 
         <div className="max-w-md space-y-6">
-          <h1 className="text-5xl font-bold leading-[1.05]">{t("heroTitle")}</h1>
+          <h1 className="text-4xl font-bold leading-[1.05] sm:text-5xl">{t("heroTitle")}</h1>
           <div className="space-y-2">
             <p className="text-title-3">{t("heroTagline")}</p>
             <p className="text-body-lg text-ink-inverse/60">{t("heroSubtitle")}</p>
           </div>
         </div>
 
-        <figure className="max-w-md rounded-panel bg-ink-inverse/5 p-6">
+        {/* Citação — só no desktop (no mobile a 1ª dobra fica enxuta). */}
+        <figure className="hidden max-w-md rounded-panel bg-ink-inverse/5 p-6 lg:block">
           <blockquote className="text-body text-ink-inverse/80">{`“${t("quote")}”`}</blockquote>
           <figcaption className="mt-3 text-caption text-ink-inverse/50">
             {t("quoteAuthor")}
@@ -59,8 +62,10 @@ export function SignInPage() {
         </figure>
       </aside>
 
-      {/* ---- Painel direito (formulário) ---- */}
-      <main className="flex flex-col items-center justify-center gap-6 bg-surface p-6">
+      {/* ---- Painel direito (formulário) ----
+          Mobile: 2ª dobra sobre o mesmo navy do hero → o card branco "flutua".
+          Desktop: coluna direita branca (bg-surface). pb respeita o home indicator. */}
+      <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-hero-navy p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] lg:min-h-0 lg:bg-surface">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-md space-y-5 rounded-panel bg-surface p-8 shadow-elev-3 ring-1 ring-line"
@@ -113,7 +118,7 @@ export function SignInPage() {
           <p className="text-center text-caption text-ink-muted">{t("restricted")}</p>
         </form>
 
-        <p className="text-caption text-ink-muted">{t("hackathon")}</p>
+        <p className="text-caption text-ink-inverse/60 lg:text-ink-muted">{t("hackathon")}</p>
 
         <span className="inline-flex items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
           <CheckGlyph />
