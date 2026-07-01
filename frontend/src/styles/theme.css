@@ -17,6 +17,39 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Tooltip do mapa que carrega o RegionKpiCard (hover dos bairros):
+   remove a "caixa" padrão do Leaflet (fundo/borda/sombra/seta/padding)
+   p/ mostrar só o card, com seu próprio estilo. */
+.leaflet-tooltip.region-kpi-tooltip {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.leaflet-tooltip.region-kpi-tooltip::before {
+  display: none;
+}
+
+/* Rótulo fixo do nome do bairro (divIcon) — texto centralizado com halo
+   branco p/ legibilidade sobre as manchas pastel. Sem caixa/borda. */
+.leaflet-marker-icon.bairro-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  pointer-events: none;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--color-ink);
+  text-shadow:
+    0 0 3px #fff,
+    0 0 3px #fff,
+    0 0 2px #fff;
+}
+
 /* ---- Fundo do painel escuro (auth/hero) — navy + glows radiais azuis ----
    Estimado do print: base navy + brilho azul mais claro à direita/cantos. */
 .bg-hero-navy {
