@@ -11,6 +11,8 @@
   "passwordLabel": "Password",
   "forgotPassword": "Forgot my password",
   "signIn": "Sign in",
+  "accessAccount": "Access your account",
+  "back": "Back",
   "or": "or",
   "signInGov": "Sign in with gov.br",
   "restricted": "Access restricted to municipal public servants.",

@@ -11,6 +11,8 @@
   "passwordLabel": "Contraseña",
   "forgotPassword": "Olvidé mi contraseña",
   "signIn": "Entrar",
+  "accessAccount": "Acceder a tu cuenta",
+  "back": "Volver",
   "or": "o",
   "signInGov": "Entrar con gov.br",
   "restricted": "Acceso restringido a funcionarios públicos municipales.",

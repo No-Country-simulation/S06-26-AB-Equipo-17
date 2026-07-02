@@ -11,6 +11,8 @@
   "passwordLabel": "Senha",
   "forgotPassword": "Esqueci minha senha",
   "signIn": "Entrar",
+  "accessAccount": "Acessar sua conta",
+  "back": "Voltar",
   "or": "ou",
   "signInGov": "Entrar com gov.br",
   "restricted": "Acesso restrito a servidores públicos municipais.",
