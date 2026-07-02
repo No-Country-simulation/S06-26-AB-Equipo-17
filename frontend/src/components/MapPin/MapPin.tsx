@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 import { cx, styles } from "./MapPin.styles";
-import { stateStyles, type MapPinState } from "./MapPin.states";
+import {
+  sizeStyles,
+  stateStyles,
+  type MapPinSize,
+  type MapPinState,
+} from "./MapPin.states";
 
 /** Ícone padrão do pin (quadrado arredondado). `currentColor` herda a cor do estado. */
 function SquareGlyph() {
@@ -14,6 +19,8 @@ function SquareGlyph() {
 export type MapPinProps = {
   /** Estado do marcador (define cor, ícone e glow). */
   state?: MapPinState;
+  /** Tamanho do círculo: `md` (56, DS) ou `sm` (32, camadas densas). */
+  size?: MapPinSize;
   /** Rótulo acessível (aria-label). */
   label: string;
   /** Ícone interno (default: quadrado arredondado). */
@@ -27,14 +34,14 @@ export type MapPinProps = {
  *  - selected  : azul + glow azul
  *  - alert      : vermelho + glow vermelho
  */
-export function MapPin({ state = "default", label, icon, onClick }: MapPinProps) {
+export function MapPin({ state = "default", size = "md", label, icon, onClick }: MapPinProps) {
   return (
     <button
       type="button"
       aria-label={label}
       aria-pressed={state === "selected"}
       onClick={onClick}
-      className={cx(styles.pin, stateStyles[state])}
+      className={cx(styles.pin, sizeStyles[size], stateStyles[state])}
     >
       <span className={styles.icon} aria-hidden="true">
         {icon ?? <SquareGlyph />}

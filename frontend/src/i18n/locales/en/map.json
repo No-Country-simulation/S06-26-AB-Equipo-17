@@ -18,8 +18,5 @@
     "monitoring": "Monitoring",
     "highCriticality": "High criticality",
     "noCoverage": "No coverage"
-  },
-  "hover": {
-    "label": "Total Residents Served"
   }
 }

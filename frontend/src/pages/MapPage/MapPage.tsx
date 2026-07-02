@@ -13,8 +13,7 @@ import { RegionKpiCard } from "../../components/RegionKpiCard";
 import { QueryFlowModal } from "../../features/query-flow";
 import { useMapData } from "../../api/hooks";
 import { regionStyle } from "./regions";
-import { indexByName, mockRegionKpis, toCardProps } from "./regionKpis";
-import { toCoverageZones } from "./coverage";
+import { indexByName, toBairroKpis, toCoverageZones } from "./coverage";
 import bairros from "./bairros.json";
 
 // Corrige os ícones padrão do Leaflet com bundlers (Vite resolve as imagens
@@ -52,17 +51,6 @@ const BAIRRO_LABELS = BAIRROS.features.flatMap((feature) => {
   });
   return [{ name, center, icon }];
 });
-
-/** KPIs por bairro (hover) — índice por nome. MOCK hoje; no futuro o payload
- *  do GET /mapa entra em `mockRegionKpis` (ver ./regionKpis.ts). */
-const REGION_KPIS = indexByName(
-  mockRegionKpis(
-    BAIRROS.features.flatMap((f) => {
-      const name = f.properties?.name as string | undefined;
-      return name ? [name] : [];
-    }),
-  ),
-);
 
 /** Temas do mapa (filtro client-side; o `/mapa` traz tudo). Os rótulos vêm
  *  do i18n (namespace `map`) — ver `themes.*`. `network` liga a camada de
@@ -145,13 +133,21 @@ export function MapPage() {
       icon: L.divIcon({
         className: "coverage-pin",
         html: renderToStaticMarkup(
-          <MapPin state="selected" label={`${t("coverage.pinLabel")}: ${zone.label}`} />,
+          <MapPin size="sm" state="selected" label={`${t("coverage.pinLabel")}: ${zone.label}`} />,
         ),
-        iconSize: [56, 56],
-        iconAnchor: [28, 28],
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
       }),
     }));
   }, [mapData, t]);
+
+  // KPIs por bairro (hover) — dado real do GET /mapa via join híbrido
+  // zona→bairro (nome normalizado primeiro, espacial de fallback — ver
+  // ./coverage.ts). Bairro sem zona monitorada fica SEM card (é informação).
+  const regionKpis = useMemo(
+    () => indexByName(mapData ? toBairroKpis(mapData.points, BAIRROS) : []),
+    [mapData],
+  );
 
   // Legenda montada uma vez e reutilizada em dois pontos (canto no desktop /
   // acima do prompt no tablet); só um deles fica visível por breakpoint.
@@ -183,18 +179,23 @@ export function MapPage() {
         />
 
         {/* Bairros — manchas pastel com borda branca. No hover, um card KPI
-            (RegionKpiCard) segue o cursor. Dados MOCK por ora.
-            key={i18n.language} → rebinda os tooltips ao trocar de idioma. */}
+            (RegionKpiCard) segue o cursor com o dado REAL do GET /mapa.
+            key = idioma + versão do dado → o bind do tooltip é imperativo e
+            roda 1x na montagem; remonta ao trocar idioma OU quando o payload
+            async chega. */}
         <GeoJSON
-          key={i18n.language}
+          key={`${i18n.language}:${mapData ? "data" : "empty"}`}
           data={BAIRROS}
           style={regionStyle}
           onEachFeature={(feature, layer) => {
             const name = feature.properties?.name as string | undefined;
-            const kpi = name ? REGION_KPIS[name] : undefined;
-            if (!kpi) return; // sem dado p/ o bairro → sem card
+            const kpi = name ? regionKpis[name] : undefined;
+            if (!kpi) return; // sem zona monitorada no bairro → sem card
             const html = renderToStaticMarkup(
-              <RegionKpiCard {...toCardProps(kpi, t("hover.label"))} />,
+              <RegionKpiCard
+                value={kpi.peak.toLocaleString("pt-BR")}
+                label={t("coverage.peakLabel")}
+              />,
             );
             layer.bindTooltip(html, {
               sticky: true,
@@ -217,7 +218,7 @@ export function MapPage() {
         {theme === "network" &&
           coveragePins.map((zone) => (
             <Marker key={zone.region} position={[zone.lat, zone.lng]} icon={zone.icon}>
-              <Tooltip direction="top" offset={[0, -28]} opacity={1} className="region-kpi-tooltip">
+              <Tooltip direction="top" offset={[0, -16]} opacity={1} className="region-kpi-tooltip">
                 <RegionKpiCard
                   value={zone.peak.toLocaleString("pt-BR")}
                   label={`${zone.label} · ${t("coverage.peakLabel")}`}

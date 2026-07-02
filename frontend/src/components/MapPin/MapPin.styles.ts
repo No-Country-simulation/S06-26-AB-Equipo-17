@@ -10,9 +10,9 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
 }
 
 export const styles = {
-  /** Círculo 56×56 — cor/glow vêm do estado. */
+  /** Círculo — dimensões vêm do tamanho e cor/glow do estado (states.ts). */
   pin: cx(
-    "inline-flex h-14 w-14 items-center justify-center rounded-full transition-all",
+    "inline-flex items-center justify-center rounded-full transition-all",
     "outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
   ),
   /** Ícone interno — herda a cor do estado (use SVG com fill="currentColor"). */

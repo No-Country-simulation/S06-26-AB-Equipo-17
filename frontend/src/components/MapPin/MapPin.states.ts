@@ -13,3 +13,13 @@ export const stateStyles: Record<MapPinState, string> = {
   selected: "bg-primary text-ink-inverse shadow-glow-primary",
   alert: "bg-critical text-ink-inverse shadow-glow-critical",
 };
+
+export type MapPinSize = "sm" | "md";
+
+/** Tamanhos (círculo + ícone interno via [&_svg]): `md` = DS (56px);
+ *  `sm` (32px) p/ camadas densas — muitos pins no mesmo enquadramento
+ *  (ex.: zonas do GET /mapa na MapPage). */
+export const sizeStyles: Record<MapPinSize, string> = {
+  sm: "h-8 w-8 [&_svg]:size-3",
+  md: "h-14 w-14",
+};

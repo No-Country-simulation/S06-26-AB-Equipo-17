@@ -18,8 +18,5 @@
     "monitoring": "Em monitoramento",
     "highCriticality": "Alta criticidade",
     "noCoverage": "Sem cobertura"
-  },
-  "hover": {
-    "label": "Total de Residentes Atendidos"
   }
 }
