@@ -7,15 +7,17 @@
    ============================================================ */
 
 /**
- * Decide a estratégia de exportação por ambiente (exportação HÍBRIDA):
- *  - `true`  → DESKTOP (browser, não instalado): usar impressão nativa
- *    (react-to-print) do paper HTML estilizado — diálogo com preview/salvar.
- *  - `false` → PWA standalone (iOS incluso, onde `window.print()` quebra) ou
- *    dispositivo touch: usar @react-pdf + Web Share/download.
- * Sinais: PWA standalone nunca imprime; senão, exige ponteiro fino + hover
- * (desktop com mouse), o que exclui celular/tablet touch.
+ * Detecta DESKTOP em browser (não instalado como PWA, com mouse):
+ *  - `true`  → desktop → abrir o PDF numa **nova aba** (visor do browser:
+ *    preview + imprimir + salvar). Melhor UX no web que o download silencioso.
+ *  - `false` → PWA standalone (iOS incluso) ou touch (celular/tablet) → usar
+ *    Web Share/download via `exportPdf`.
+ * Sinais: standalone nunca abre aba; senão exige ponteiro fino + hover (mouse),
+ * o que exclui touch.
+ * (Obs.: NÃO usamos `window.print()`/react-to-print — o print via iframe perde
+ * a user-activation ao carregar o CSS/fontes e é bloqueado silenciosamente.)
  */
-export function preferNativePrint(): boolean {
+export function isDesktopBrowser(): boolean {
   if (typeof window === "undefined") return false;
   const standalone =
     window.matchMedia("(display-mode: standalone)").matches ||

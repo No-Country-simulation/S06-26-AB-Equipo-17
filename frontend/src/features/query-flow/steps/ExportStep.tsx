@@ -1,12 +1,10 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useReactToPrint } from "react-to-print";
 import { Download, Link2, Scale } from "lucide-react";
 import { Button } from "@/components/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { exportPdf, preferNativePrint } from "@/libs/exportPdf";
+import { exportPdf, isDesktopBrowser } from "@/libs/exportPdf";
 import type { QueryResult } from "@/types";
-import { PrintablePaper } from "../PrintablePaper";
 
 type ExportOption = "pdf" | "link";
 
@@ -18,13 +16,13 @@ export type ExportStepProps = {
 };
 
 /**
- * Passo 4 — exportar o relatório em PDF ou copiar link. Exportação HÍBRIDA
- * (ver `preferNativePrint`):
- *  - DESKTOP → impressão nativa (react-to-print) do `PrintablePaper` HTML
- *    estilizado → diálogo com preview / salvar como PDF (melhor no web).
- *  - MOBILE/PWA/iOS → PDF gerado no cliente (@react-pdf/renderer → Blob,
- *    import dinâmico) + Web Share/download. NÃO usa window.print() (quebra no
- *    PWA standalone do iOS).
+ * Passo 4 — exportar o relatório em PDF ou copiar link. O PDF é gerado no
+ * cliente com `@react-pdf/renderer` (import dinâmico → chunk próprio) e entregue
+ * conforme o ambiente (ver `isDesktopBrowser`):
+ *  - DESKTOP → abre o PDF numa **nova aba** (visor do browser: preview +
+ *    imprimir + salvar). A aba é aberta no clique (gesto) p/ não ser bloqueada.
+ *  - MOBILE/PWA/iOS → `exportPdf`: Web Share (share sheet) com fallback download.
+ * NÃO usa window.print()/react-to-print (quebra/bloqueia no PWA iOS e no iframe).
  */
 export function ExportStep({ question, result }: ExportStepProps) {
   const { t, i18n } = useTranslation("query");
@@ -36,24 +34,15 @@ export function ExportStep({ question, result }: ExportStepProps) {
   );
   const sourceCount = result.sources.length;
 
-  // Impressão nativa (desktop) — clona o PrintablePaper fora da tela.
-  const paperRef = useRef<HTMLDivElement>(null);
-  const printPaper = useReactToPrint({
-    contentRef: paperRef,
-    documentTitle: t("export.printDocTitle"),
-  });
-
   async function handleExport() {
     if (selected === "link") {
       void navigator.clipboard?.writeText(window.location.href);
       return;
     }
-    // Desktop (browser) → impressão nativa do paper HTML estilizado.
-    if (preferNativePrint()) {
-      printPaper();
-      return;
-    }
-    // Mobile / PWA / iOS → PDF gerado (@react-pdf) + Web Share/download.
+    // Desktop → abre a aba AGORA (dentro do gesto do clique), senão o popup é
+    // bloqueado; preenche a URL quando o Blob estiver pronto.
+    const previewInTab = isDesktopBrowser();
+    const tab = previewInTab ? window.open("", "_blank") : null;
     setBusy(true);
     try {
       // Lazy: só baixa o @react-pdf (pesado) quando realmente vai gerar o Blob.
@@ -79,8 +68,19 @@ export function ExportStep({ question, result }: ExportStepProps) {
           result={result}
         />,
       ).toBlob();
-      await exportPdf(blob, `${t("export.printDocTitle")}.pdf`);
+
+      if (tab && !tab.closed) {
+        // Desktop → PDF na nova aba (preview + imprimir + salvar).
+        const url = URL.createObjectURL(blob);
+        tab.location.href = url;
+        // Revoga só depois da aba carregar (revogar cedo cancela o carregamento).
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      } else {
+        // Mobile/PWA → share/download. (Também cai aqui se o popup foi bloqueado.)
+        await exportPdf(blob, `${t("export.printDocTitle")}.pdf`);
+      }
     } catch {
+      tab?.close();
       // TODO: UI de erro (sem toast por ora). Evita unhandled rejection.
     } finally {
       setBusy(false);
@@ -135,13 +135,6 @@ export function ExportStep({ question, result }: ExportStepProps) {
       <Button variant="primary" fullWidth disabled={busy} onClick={handleExport}>
         {busy ? t("export.generating") : t("export.download")}
       </Button>
-
-      {/* Documento imprimível (desktop/react-to-print) — fora da tela;
-          `display:none` não funciona com react-to-print, então posicionamos
-          fora do viewport. */}
-      <div className="pointer-events-none fixed -left-[10000px] top-0" aria-hidden="true">
-        <PrintablePaper ref={paperRef} question={question} result={result} />
-      </div>
     </>
   );
 }
