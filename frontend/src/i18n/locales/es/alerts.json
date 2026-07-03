@@ -1,0 +1,64 @@
+{
+  "list": {
+    "title": "Alertas activas",
+    "items": {
+      "coverage": { "title": "Cobertura 4G crítica", "subtitle": "Región Este · Anatel", "time": "Ahora" },
+      "edital": { "title": "Convocatoria vence en 18 días", "subtitle": "MCTI #42/2026", "time": "hace 2 h" },
+      "ibge": { "title": "Datos IBGE desactualizados", "subtitle": "Regiones Norte y Sur", "time": "Ayer" },
+      "report": { "title": "Informe de junio disponible", "subtitle": "Indicadores · todas las regiones", "time": "Hoy, 06:00" },
+      "mec": { "title": "MEC #18/2026 enviado", "subtitle": "Justificación protocolizada", "time": "28 jun" },
+      "estimate": { "title": "Nueva estimación IBGE", "subtitle": "Región Continente · 2026", "time": "27 jun" },
+      "analysis": { "title": "Análisis concluido", "subtitle": "Vulnerabilidad Social T2", "time": "26 jun" }
+    }
+  },
+  "badge": {
+    "critical": "Crítico",
+    "warning": "Aviso",
+    "info": "Info",
+    "success": "OK"
+  },
+  "detail": {
+    "title": "Cobertura 4G — Región Este",
+    "source": "Detectado vía CDRView + Anatel",
+    "stat": { "value": "22%", "label": "cobertura 4G", "min": "Mínimo: 30%" },
+    "context": {
+      "title": "Contexto",
+      "items": {
+        "region": { "label": "Región", "value": "Este — Florianópolis" },
+        "source": { "label": "Fuente", "value": "CDRView + Anatel (jun 2026)" },
+        "affected": { "label": "Afectados", "value": "47.320 residentes" },
+        "history": { "label": "Histórico", "value": "May: 24% · Abr: 25%" }
+      }
+    },
+    "recommendation": {
+      "title": "Recomendación",
+      "text": "Califica para la convocatoria MCTI #42/2026. Justificación generada y disponible."
+    },
+    "actions": {
+      "title": "Acciones",
+      "map": "Ver en el mapa",
+      "justification": "Ver justificación"
+    }
+  },
+  "config": {
+    "title": "Configurar alertas",
+    "region": {
+      "label": "Región monitoreada",
+      "options": ["Todas las regiones", "Centro", "Norte", "Este", "Sur", "Continente"]
+    },
+    "indicator": {
+      "label": "Indicador",
+      "options": ["Cobertura 4G", "Vulnerabilidad", "Empleabilidad", "Salud mental"]
+    },
+    "threshold": { "label": "Límite crítico", "value": "30%", "suffix": "por debajo de" },
+    "notify": {
+      "label": "Notificar vía",
+      "channels": { "panel": "Panel AppBiT", "email": "Correo", "pdf": "Informe PDF" }
+    },
+    "frequency": {
+      "label": "Frecuencia",
+      "options": { "realtime": "Tiempo real", "hourly": "Cada hora", "daily": "Diario" }
+    },
+    "save": "Guardar configuración"
+  }
+}

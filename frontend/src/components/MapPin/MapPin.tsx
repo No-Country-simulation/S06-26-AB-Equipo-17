@@ -1,51 +1,48 @@
 import type { ReactNode } from "react";
 import { cx, styles } from "./MapPin.styles";
-import {
-  sizeStyles,
-  stateStyles,
-  type MapPinSize,
-  type MapPinState,
-} from "./MapPin.states";
-
-/** Ícone padrão do pin (quadrado arredondado). `currentColor` herda a cor do estado. */
-function SquareGlyph() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" aria-hidden="true">
-      <rect width="22" height="22" rx="6" />
-    </svg>
-  );
-}
+import { sizeStyles, toneStyles, type MapPinSize, type MapPinTone } from "./MapPin.states";
 
 export type MapPinProps = {
-  /** Estado do marcador (define cor, ícone e glow). */
-  state?: MapPinState;
-  /** Tamanho do círculo: `md` (56, DS) ou `sm` (32, camadas densas). */
+  /** Tom do ponto (cor) — espelha a legenda do mapa. Default "info". */
+  tone?: MapPinTone;
+  /** Tamanho do círculo: `sm` (32) p/ camadas densas ou `md` (56, DS). */
   size?: MapPinSize;
   /** Rótulo acessível (aria-label). */
   label: string;
-  /** Ícone interno (default: quadrado arredondado). */
+  /** Ícone interno opcional (branco, centralizado). Sem ícone = ponto puro. */
   icon?: ReactNode;
+  /** Destaca o ponto como selecionado (anel reforçado). */
+  selected?: boolean;
   onClick?: () => void;
 };
 
 /**
- * Marcador do mapa — círculo com 3 estados (DS):
- *  - default   : cinza-claro
- *  - selected  : azul + glow azul
- *  - alert      : vermelho + glow vermelho
+ * Ponto do mapa — círculo sólido colorido pelo TOM (mesma paleta da legenda):
+ *  success (verde) · info (azul) · warning (âmbar) · orange (laranja) ·
+ *  critical (vermelho) · neutral (cinza). Componente puro (sem hooks) → pode
+ *  ser serializado com renderToStaticMarkup para virar um divIcon do Leaflet.
  */
-export function MapPin({ state = "default", size = "md", label, icon, onClick }: MapPinProps) {
+export function MapPin({
+  tone = "info",
+  size = "md",
+  label,
+  icon,
+  selected = false,
+  onClick,
+}: MapPinProps) {
   return (
     <button
       type="button"
       aria-label={label}
-      aria-pressed={state === "selected"}
+      aria-pressed={selected}
       onClick={onClick}
-      className={cx(styles.pin, sizeStyles[size], stateStyles[state])}
+      className={cx(styles.pin, sizeStyles[size], toneStyles[tone], selected && styles.selected)}
     >
-      <span className={styles.icon} aria-hidden="true">
-        {icon ?? <SquareGlyph />}
-      </span>
+      {icon && (
+        <span className={styles.icon} aria-hidden="true">
+          {icon}
+        </span>
+      )}
     </button>
   );
 }

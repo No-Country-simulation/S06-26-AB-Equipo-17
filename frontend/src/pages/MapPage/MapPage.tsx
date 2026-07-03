@@ -133,7 +133,7 @@ export function MapPage() {
       icon: L.divIcon({
         className: "coverage-pin",
         html: renderToStaticMarkup(
-          <MapPin size="sm" state="selected" label={`${t("coverage.pinLabel")}: ${zone.label}`} />,
+          <MapPin size="sm" tone="info" label={`${t("coverage.pinLabel")}: ${zone.label}`} />,
         ),
         iconSize: [32, 32],
         iconAnchor: [16, 16],
