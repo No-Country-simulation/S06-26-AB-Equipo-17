@@ -1,3 +1,3 @@
 export { MapPin } from "./MapPin";
 export type { MapPinProps } from "./MapPin";
-export type { MapPinState } from "./MapPin.states";
+export type { MapPinTone } from "./MapPin.states";
