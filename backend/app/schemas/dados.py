@@ -54,6 +54,30 @@ class Visualizacao(BaseModel):
     dados: list[PontoMapa] = Field(default_factory=list)
 
 
+# ---------- Mapa (GET /mapa/*) ----------
+class FluxoMapa(BaseModel):
+    """Um fluxo origem→destino do OD (linha/seta no mapa + hover card)."""
+
+    origem: str
+    destino: str
+    municipio_origem: str | None = None  # o OD tem ausentes reais
+    municipio_destino: str | None = None
+    lat_origem: float | None = None
+    lng_origem: float | None = None
+    lat_destino: float | None = None
+    lng_destino: float | None = None
+    viagens: int | None = None
+    usuarios: int | None = None
+    dist_km: float | None = None
+    periodo: str | None = None  # período predominante do fluxo
+    mesmo_cluster: bool | None = None  # fluxo interno (origem = destino no mapa)
+
+
+class VisualizacaoFluxos(BaseModel):
+    tipo: str = "fluxos"
+    dados: list[FluxoMapa] = Field(default_factory=list)
+
+
 class RespostaPaper(BaseModel):
     afirmacao: str
     evidencias: list[Evidencia] = Field(default_factory=list)

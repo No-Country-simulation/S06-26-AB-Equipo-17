@@ -1,8 +1,4 @@
-"""Router mestre da v1 (montado sob /api/v1).
-
-Por enquanto só `/health`. Os endpoints `/dados` e `/mapa` serão adicionados pela
-frente de Backend/API (outra pessoa do time).
-"""
+"""Router mestre da v1 (montado sob /api/v1): /health, /dados e /mapa (pacote)."""
 
 from fastapi import APIRouter
 

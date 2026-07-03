@@ -1,3 +1,5 @@
+"""GET /mapa — pins de concentração por zona (camada base do mapa)."""
+
 from fastapi import APIRouter, Query
 
 from app.schemas.dados import PontoMapa, Visualizacao
