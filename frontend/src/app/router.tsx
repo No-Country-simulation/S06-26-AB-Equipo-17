@@ -5,7 +5,6 @@ import { Suspense, lazy, type ReactNode } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppLayout } from "./AppLayout";
 import { PageFallback } from "./PageFallback";
-import { PlaceholderPage } from "../pages/PlaceholderPage";
 
 // Páginas pesadas/raras viram chunks separados (lazy) — tiram o Leaflet
 // do carregamento inicial.
@@ -20,6 +19,9 @@ const AnalyticsPage = lazy(() =>
 );
 const ReportsPage = lazy(() =>
   import("../pages/ReportsPage").then((m) => ({ default: m.ReportsPage })),
+);
+const AlertsPage = lazy(() =>
+  import("../pages/AlertsPage").then((m) => ({ default: m.AlertsPage })),
 );
 
 /** Envolve um elemento lazy no Suspense (fallback de carregamento). */
@@ -40,7 +42,7 @@ export const router = createBrowserRouter([
       { path: "map", element: <MapPage /> },
       { path: "analytics", element: <AnalyticsPage /> },
       { path: "reports", element: <ReportsPage /> },
-      { path: "alerts", element: <PlaceholderPage titleKey="alerts" /> },
+      { path: "alerts", element: <AlertsPage /> },
     ],
   },
 ]);
