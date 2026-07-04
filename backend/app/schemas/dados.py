@@ -47,6 +47,7 @@ class PontoMapa(BaseModel):
     lat: float | None = None
     lng: float | None = None
     valor: float | None = None
+    sem_dados: bool = False  # True = pin vermelho no mapa
 
 
 class Visualizacao(BaseModel):

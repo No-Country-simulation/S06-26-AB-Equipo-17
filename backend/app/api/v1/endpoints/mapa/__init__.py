@@ -6,10 +6,11 @@ Interface estável: `api.py` monta só este `router`, que agrega os módulos —
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints.mapa import concentracao, mobilidade
+from app.api.v1.endpoints.mapa import concentracao, mobilidade, rede
 
 router = APIRouter()
 router.include_router(concentracao.router)
 router.include_router(mobilidade.router)
+router.include_router(rede.router)
 
 __all__ = ["router"]
