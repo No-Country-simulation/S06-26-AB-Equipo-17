@@ -26,4 +26,4 @@ def dados_mapa_rede(regiao: str | None = Query(default=None)):
                 sem_dados=sem_dados,
             )
         )
-        return Visualizacao(tipo="mapa", dados=pontos)
+    return Visualizacao(tipo="mapa", dados=pontos)
