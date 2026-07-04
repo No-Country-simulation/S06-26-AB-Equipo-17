@@ -79,6 +79,32 @@ class VisualizacaoFluxos(BaseModel):
     dados: list[FluxoMapa] = Field(default_factory=list)
 
 
+class BairroOverview(BaseModel):
+    """Um bairro do referencial: monitorado (com zonas do Vísent) ou vazio."""
+
+    bairro: str
+    monitorado: bool
+    zonas: list[str] = Field(default_factory=list)  # vazio = sem monitoramento
+    antenas: int = 0  # antenas fisicamente dentro do polígono do bairro
+
+
+class ZonaForaReferencial(BaseModel):
+    """Zona monitorada sem bairro no referencial (continente: São José/Palhoça/Biguaçu)."""
+
+    zona: str
+    municipio: str
+    lat: float | None = None  # centroide das antenas da zona
+    lng: float | None = None
+    antenas: int = 0
+
+
+class VisualizacaoOverview(BaseModel):
+    tipo: str = "overview"
+    total_antenas: int = 0
+    dados: list[BairroOverview] = Field(default_factory=list)
+    zonas_fora_referencial: list[ZonaForaReferencial] = Field(default_factory=list)
+
+
 class RespostaPaper(BaseModel):
     afirmacao: str
     evidencias: list[Evidencia] = Field(default_factory=list)
