@@ -95,3 +95,41 @@ def test_mobilidade_nan_vira_none():
 
 def test_mobilidade_serializa_em_json_nativo():
     json.dumps(data_service.buscar_mobilidade(regiao=None))
+
+
+def test_monitoramento_cobre_o_referencial_inteiro():
+    cruz = data_service.buscar_monitoramento()
+    # TODOS os bairros do referencial voltam — os sem monitoramento vão vazios
+    assert len(cruz["bairros"]) == 56
+    assert cruz["total_antenas"] == 132
+    vazios = [b for b in cruz["bairros"] if not b["monitorado"]]
+    assert vazios and all(b["zonas"] == [] and b["antenas"] == 0 for b in vazios)
+
+
+def test_monitoramento_join_por_nome_e_espacial():
+    bairros = {b["bairro"]: b for b in data_service.buscar_monitoramento()["bairros"]}
+    # nome: INGLESES casa "Ingleses do Rio Vermelho" (zona é prefixo do bairro)
+    assert "INGLESES" in bairros["Ingleses do Rio Vermelho"]["zonas"]
+    # nome: ESTREITO_CAPOEIRAS casa os DOIS bairros (trecho contíguo da zona)
+    assert "ESTREITO_CAPOEIRAS" in bairros["Estreito"]["zonas"]
+    assert "ESTREITO_CAPOEIRAS" in bairros["Capoeiras"]["zonas"]
+    # espacial: SC401_CORREDOR não é bairro, mas as antenas caem em Itacorubi
+    assert "SC401_CORREDOR" in bairros["Itacorubi"]["zonas"]
+    # união nome+espacial: bairro com antena dentro NUNCA fica "não monitorado"
+    assert all(b["monitorado"] for b in bairros.values() if b["antenas"] > 0)
+
+
+def test_monitoramento_continente_fica_fora_do_referencial():
+    cruz = data_service.buscar_monitoramento()
+    fora = {z["zona"] for z in cruz["zonas_fora"]}
+    # gate espacial ANTES do nome: SAO_JOSE_CENTRO não pode casar o Centro de Floripa
+    assert "SAO_JOSE_CENTRO" in fora
+    bairros = {b["bairro"]: b for b in cruz["bairros"]}
+    assert "SAO_JOSE_CENTRO" not in bairros["Centro"]["zonas"]
+    # os 7 grupos do continente (São José/Palhoça/Biguaçu), com centroide pro pin
+    assert len(fora) == 7
+    assert all(z["lat"] and z["lng"] and z["antenas"] > 0 for z in cruz["zonas_fora"])
+
+
+def test_monitoramento_serializa_em_json_nativo():
+    json.dumps(data_service.buscar_monitoramento())
