@@ -42,9 +42,13 @@ http.interceptors.response.use(
   },
 );
 
+/** Query params do GET (axios omite chaves `undefined` — ex.: filtro opcional). */
+type QueryParams = Record<string, string | number | boolean | undefined>;
+
 /** Fachada tipada. Use nos endpoints (api/endpoints.ts). */
 export const api = {
-  get: <T>(path: string) => http.get<T>(path).then((r) => r.data),
+  get: <T>(path: string, params?: QueryParams) =>
+    http.get<T>(path, { params }).then((r) => r.data),
   post: <T>(path: string, body?: unknown) =>
     http.post<T>(path, body).then((r) => r.data),
 };
