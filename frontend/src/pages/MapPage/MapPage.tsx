@@ -11,9 +11,12 @@ import { Legend } from "../../components/Legend";
 import { MapPin } from "../../components/MapPin";
 import { RegionKpiCard } from "../../components/RegionKpiCard";
 import { QueryFlowModal } from "../../features/query-flow";
-import { useMapData } from "../../api/hooks";
+import { useMapNetwork, useMapMobility, useMapOverview } from "../../api/hooks";
+import { MapBubble } from "./MapBubble";
 import { regionStyle } from "./regions";
 import { indexByName, toBairroKpis, toCoverageZones } from "./coverage";
+import { toMobilityBubbles } from "./mobility";
+import { indexMonitoringByBairro, normalizeBairroName } from "./overview";
 import bairros from "./bairros.json";
 
 // Corrige os ícones padrão do Leaflet com bundlers (Vite resolve as imagens
@@ -43,19 +46,28 @@ const BAIRRO_LABELS = BAIRROS.features.flatMap((feature) => {
   const name = feature.properties?.name as string | undefined;
   if (!name) return [];
   const center = L.geoJSON(feature).getBounds().getCenter();
-  const icon = L.divIcon({
-    className: "bairro-label",
-    html: name,
-    iconSize: [90, 16],
-    iconAnchor: [45, 8],
-  });
-  return [{ name, center, icon }];
+  // Dois ícones: centrado no centroide (padrão) e deslocado ~22px PRA BAIXO
+  // (anchor y negativo) p/ não sobrepor o pin do overview, que fica no centroide.
+  const mkIcon = (iconAnchor: [number, number]) =>
+    L.divIcon({ className: "bairro-label", html: name, iconSize: [90, 16], iconAnchor });
+  return [{ name, center, iconCentered: mkIcon([45, 8]), iconBelow: mkIcon([45, -22]) }];
 });
 
 /** Temas do mapa (filtro client-side; o `/mapa` traz tudo). Os rótulos vêm
  *  do i18n (namespace `map`) — ver `themes.*`. `network` liga a camada de
  *  pins das zonas monitoradas (dado real do GET /mapa; ver ./coverage.ts). */
-const THEME_VALUES = ["overview", "network", "education", "health", "housing", "employment"] as const;
+const THEME_VALUES = ["overview", "network", "mobility", "education", "health", "housing", "employment"] as const;
+
+/** Cor das bolhas de mobilidade — primary do DS (Leaflet exige cor CSS crua). */
+const MOBILITY_COLOR = "#2f6bff";
+/** Raio das bolhas (px): mín. + √(viagens/máx) → área ∝ viagens (proporcional). */
+const BUBBLE_MIN_RADIUS = 10;
+const BUBBLE_MAX_RADIUS = 44;
+
+/** Congestionamento vem como taxa 0–1 → exibir como percentual ("35%"). */
+function formatCongestion(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 1 }).format(value);
+}
 
 /**
  * Controla os rótulos dos bairros conforme o zoom (deve viver dentro do
@@ -114,51 +126,103 @@ export function MapPage() {
   const [theme, setTheme] = useState("overview");
 
   const { t, i18n } = useTranslation("map");
+  const locale = i18n.resolvedLanguage ?? i18n.language;
   // Rótulos dos temas vêm do i18n; reconstroem ao trocar de idioma.
   const themes: MapFilterItem[] = THEME_VALUES.map((value) => ({
     value,
     label: t(`themes.${value}`),
   }));
 
-  // Camada "Cobertura de Rede" — dado REAL do GET /mapa (zonas Vísent).
-  const { data: mapData } = useMapData();
+  // Camada "Cobertura de Rede" (tema `network`) — dado REAL do GET /mapa/rede.
+  // Fetch LAZY: só busca quando o filtro está selecionado.
+  const { data: networkData } = useMapNetwork(theme === "network");
   // 1 pin por zona (agregado em ./coverage.ts). O divIcon é pré-computado
   // aqui (e não no render dos Markers): a página re-renderiza a cada tecla
   // do prompt e recriar o icon faria o Leaflet re-montar os pins à toa.
   // MapPin é puro (sem hooks) → pode ser serializado com renderToStaticMarkup.
+  // Zona SEM dado de rede (`noData`) → pin vermelho (tom `critical`).
   const coveragePins = useMemo(() => {
-    if (!mapData) return [];
-    return toCoverageZones(mapData.points).map((zone) => ({
+    if (!networkData) return [];
+    return toCoverageZones(networkData.points).map((zone) => ({
       ...zone,
       icon: L.divIcon({
         className: "coverage-pin",
         html: renderToStaticMarkup(
-          <MapPin size="sm" tone="info" label={`${t("coverage.pinLabel")}: ${zone.label}`} />,
+          <MapPin
+            size="sm"
+            tone={zone.noData ? "critical" : "info"}
+            label={`${t(zone.noData ? "coverage.noDataLabel" : "coverage.pinLabel")}: ${zone.label}`}
+          />,
         ),
         iconSize: [32, 32],
         iconAnchor: [16, 16],
       }),
     }));
-  }, [mapData, t]);
+  }, [networkData, t]);
 
-  // KPIs por bairro (hover) — dado real do GET /mapa via join híbrido
+  // KPIs por bairro (hover) — dado real do GET /mapa/rede via join híbrido
   // zona→bairro (nome normalizado primeiro, espacial de fallback — ver
   // ./coverage.ts). Bairro sem zona monitorada fica SEM card (é informação).
   const regionKpis = useMemo(
-    () => indexByName(mapData ? toBairroKpis(mapData.points, BAIRROS) : []),
-    [mapData],
+    () => indexByName(networkData ? toBairroKpis(networkData.points, BAIRROS) : []),
+    [networkData],
   );
+
+  // Camada "Mobilidade" (tema `mobility`) — fluxos OD do GET /mapa/mobilidade.
+  // Fetch LAZY: só busca quando o filtro está selecionado.
+  const { data: mobilityData } = useMapMobility(theme === "mobility");
+  // Agrega os fluxos em BOLHAS por zona (símbolos proporcionais — evita o
+  // espaguete das linhas). Raio ∝ √viagens → ÁREA ∝ viagens.
+  const mobilityBubbles = useMemo(() => {
+    const bubbles = toMobilityBubbles(mobilityData?.flows ?? []);
+    const maxTrips = Math.max(1, ...bubbles.map((b) => b.trips));
+    return bubbles.map((b) => ({
+      ...b,
+      radius:
+        BUBBLE_MIN_RADIUS + Math.sqrt(b.trips / maxTrips) * (BUBBLE_MAX_RADIUS - BUBBLE_MIN_RADIUS),
+    }));
+  }, [mobilityData]);
+
+  // Camada "Visão Geral" (tema `overview`) — 1 pin por BAIRRO colorido pela
+  // legenda: monitorado = azul (info, "Em monitoramento"), senão vermelho
+  // (critical, "Sem cobertura"). Join do payload (por nome) com os centroides
+  // dos bairros do GeoJSON. Fetch LAZY (overview é o tema inicial → busca já).
+  const { data: overviewData } = useMapOverview(theme === "overview");
+  const overviewPins = useMemo(() => {
+    if (!overviewData) return [];
+    const byBairro = indexMonitoringByBairro(overviewData.bairros);
+    return BAIRRO_LABELS.map((b) => {
+      const info = byBairro[normalizeBairroName(b.name)];
+      const monitored = info?.monitored ?? false;
+      const statusLabel = `${b.name} · ${t(monitored ? "legend.monitoring" : "legend.noCoverage")}`;
+      return {
+        name: b.name,
+        center: b.center,
+        monitored,
+        antennas: info?.antennas ?? 0,
+        statusLabel,
+        icon: L.divIcon({
+          className: "overview-pin",
+          html: renderToStaticMarkup(
+            <MapPin size="sm" tone={monitored ? "info" : "critical"} label={statusLabel} />,
+          ),
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
+        }),
+      };
+    });
+  }, [overviewData, t]);
 
   // Legenda montada uma vez e reutilizada em dois pontos (canto no desktop /
   // acima do prompt no tablet); só um deles fica visível por breakpoint.
+  // Só os tons usados no mapa: azul (info) = monitorado/com dado · vermelho
+  // (critical) = sem monitoramento/sem dado. Verde/laranja não são usados.
   const legend = (
     <Legend
       className="pointer-events-auto"
       title={t("legend.title")}
       items={[
-        { tone: "success", label: t("legend.fullCoverage") },
         { tone: "info", label: t("legend.monitoring") },
-        { tone: "orange", label: t("legend.highCriticality") },
         { tone: "critical", label: t("legend.noCoverage") },
       ]}
     />
@@ -184,17 +248,20 @@ export function MapPage() {
             roda 1x na montagem; remonta ao trocar idioma OU quando o payload
             async chega. */}
         <GeoJSON
-          key={`${i18n.language}:${mapData ? "data" : "empty"}`}
+          key={`${i18n.language}:${theme}:${networkData ? "data" : "empty"}`}
           data={BAIRROS}
           style={regionStyle}
           onEachFeature={(feature, layer) => {
+            // Hover de congestionamento por bairro só no tema `network` — nos
+            // outros temas a informação vem dos pins/bolhas próprios.
+            if (theme !== "network") return;
             const name = feature.properties?.name as string | undefined;
             const kpi = name ? regionKpis[name] : undefined;
             if (!kpi) return; // sem zona monitorada no bairro → sem card
             const html = renderToStaticMarkup(
               <RegionKpiCard
-                value={kpi.peak.toLocaleString("pt-BR")}
-                label={t("coverage.peakLabel")}
+                value={formatCongestion(kpi.peak, locale)}
+                label={t("coverage.congestionLabel")}
               />,
             );
             layer.bindTooltip(html, {
@@ -206,25 +273,60 @@ export function MapPage() {
           }}
         />
 
-        {/* Rótulos fixos com o nome de cada bairro (não-interativos). */}
+        {/* Rótulos fixos com o nome de cada bairro (não-interativos). No tema
+            `overview` o nome desce pra baixo do pin (que fica no centroide). */}
         {BAIRRO_LABELS.map((b) => (
-          <Marker key={b.name} position={b.center} icon={b.icon} interactive={false} />
+          <Marker
+            key={b.name}
+            position={b.center}
+            icon={theme === "overview" ? b.iconBelow : b.iconCentered}
+            interactive={false}
+          />
         ))}
 
         {/* Camada "Cobertura de Rede" (tema `network`) — um MapPin por zona
-            monitorada do Vísent (GET /mapa). Bairro sem pin = sem cobertura
-            de monitoramento (o dado não existe para todas as áreas).
+            monitorada do Vísent (GET /mapa/rede). Zona sem dado de rede =
+            pin vermelho + "sem dados"; bairro sem pin = sem monitoramento.
             Tooltip declarativo do react-leaflet → re-traduz sozinho. */}
         {theme === "network" &&
           coveragePins.map((zone) => (
             <Marker key={zone.region} position={[zone.lat, zone.lng]} icon={zone.icon}>
               <Tooltip direction="top" offset={[0, -16]} opacity={1} className="region-kpi-tooltip">
                 <RegionKpiCard
-                  value={zone.peak.toLocaleString("pt-BR")}
-                  label={`${zone.label} · ${t("coverage.peakLabel")}`}
+                  value={zone.noData ? "—" : formatCongestion(zone.peak, locale)}
+                  label={`${zone.label} · ${t(zone.noData ? "coverage.noDataLabel" : "coverage.congestionLabel")}`}
                 />
               </Tooltip>
             </Marker>
+          ))}
+
+        {/* Camada "Visão Geral" (tema `overview`) — 1 MapPin por bairro,
+            colorido pela legenda (azul = monitorado, vermelho = sem cobertura).
+            GET /mapa/overview cruzado com os centroides dos bairros. */}
+        {theme === "overview" &&
+          overviewPins.map((pin) => (
+            <Marker key={pin.name} position={pin.center} icon={pin.icon}>
+              <Tooltip direction="top" offset={[0, -16]} opacity={1} className="region-kpi-tooltip">
+                <RegionKpiCard
+                  value={pin.monitored ? pin.antennas.toLocaleString("pt-BR") : "—"}
+                  label={pin.statusLabel}
+                />
+              </Tooltip>
+            </Marker>
+          ))}
+
+        {/* Camada "Mobilidade" (tema `mobility`) — 1 bolha por zona, área ∝
+            viagens totais (GET /mapa/mobilidade agregado). Hover: zona + total. */}
+        {theme === "mobility" &&
+          mobilityBubbles.map((bubble) => (
+            <MapBubble
+              key={bubble.zone}
+              center={[bubble.lat, bubble.lng]}
+              radius={bubble.radius}
+              value={bubble.trips.toLocaleString("pt-BR")}
+              label={`${bubble.label} · ${t("mobility.tripsLabel")}`}
+              color={MOBILITY_COLOR}
+            />
           ))}
 
         {/* Ajusta tamanho/visibilidade dos rótulos conforme o zoom. */}
