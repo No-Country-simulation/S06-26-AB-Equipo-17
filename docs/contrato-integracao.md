@@ -7,8 +7,9 @@
 
 Base URL local: `http://localhost:8000`
 
-> **Todos** os endpoints ficam sob **`/api/v1`** (`/api/v1/health`, `/api/v1/dados`, `/api/v1/mapa`).
-> O `healthCheckPath` do Render aponta para `/api/v1/health`.
+> **Todos** os endpoints ficam sob **`/api/v1`**: `/health`, `/dados` e o pacote **`/mapa`** —
+> `/mapa` (concentração) · `/mapa/rede` (qualidade de rede) · `/mapa/overview` (bairros × monitoramento) ·
+> `/mapa/mobilidade` (fluxos OD). O `healthCheckPath` do Render aponta para `/api/v1/health`.
 
 ---
 
@@ -106,34 +107,116 @@ O brief pede `{ resposta_ia, dados, fontes }`. Nosso formato é uma **extensão*
 
 ## `GET /api/v1/mapa`
 
-Dados georreferenciados para renderizar o mapa.
+Concentração por zona monitorada (camada base). Devolve o schema **`Visualizacao`** (o mesmo do
+`visualizacao` do POST /dados): ~4 leituras por zona (períodos do dia, **sem rótulo de período** no
+payload) com a coordenada da antena agregadora — o **front agrega por zona** (1 pin/valor por zona).
 
 ### Query params (opcionais)
-`?indicador=concentracao&periodo=TARDE`
+`?regiao=Campeche` — filtra pela zona (origem do cluster).
 
 ### Response 200
 ```json
 {
-  "regioes": [
+  "tipo": "mapa",
+  "dados": [
+    { "regiao": "TRINDADE", "lat": -27.5985, "lng": -48.5230, "valor": 18400, "sem_dados": false }
+  ]
+}
+```
+- `regiao` = **cluster** Vísent (`UPPER_SNAKE`, ex.: `TRINDADE`, `CBD_BEIRAMAR`) — **não** é bairro.
+- `valor` = **concentração** (média de usuários da zona, inteiro). Pode ser `null`.
+- `sem_dados` = `true` quando não há leitura válida (no `/mapa` fica `false`; ver `/mapa/rede`).
+
+---
+
+## `GET /api/v1/mapa/rede`
+
+Cobertura/qualidade de **rede** por zona. **Mesmo schema `Visualizacao`** do `/mapa`, mas o `valor`
+muda de significado: aqui é o **congestionamento** (taxa 0–1, média ponderada por usuários).
+
+### Query params (opcionais)
+`?regiao=Campeche` — filtra pela zona.
+
+### Response 200
+```json
+{
+  "tipo": "mapa",
+  "dados": [
+    { "regiao": "TRINDADE", "lat": -27.5985, "lng": -48.5230, "valor": 0.35, "sem_dados": false }
+  ]
+}
+```
+- `valor` = **congestionamento** (0–1) — o front exibe como **percentual** ("35%"). ⚠️ No dataset atual
+  é **quase uniforme** (~0,35 em todas as zonas); o `drop_pct` também. A métrica que varia entre zonas é
+  a **concentração** (`/mapa`), não a rede.
+- `sem_dados` = `true` quando congestionamento **ou** drop está ausente → **pin vermelho** ("Sem cobertura")
+  no front; senão pin azul ("Em monitoramento").
+
+---
+
+## `GET /api/v1/mapa/mobilidade`
+
+Fluxos origem→destino (OD por cluster) para desenhar linhas/setas sobre o mapa.
+
+### Query params (opcionais)
+`?regiao=Campeche` — sem `regiao`, devolve os **80 maiores fluxos** por nº de viagens;
+com `regiao`, devolve **todos os fluxos que tocam a zona** (origem OU destino).
+
+### Response 200
+```json
+{
+  "tipo": "fluxos",
+  "dados": [
     {
-      "regiao": "Florianópolis",
-      "lat": -27.5954,
-      "lng": -48.5480,
-      "concentracao": 18400,
-      "cobertura_rede": "4G",
-      "indicadores": { "emprego": 0.62, "saude_mental": null }
-    },
-    {
-      "regiao": "São José",
-      "lat": -27.6136,
-      "lng": -48.6366,
-      "concentracao": 12300,
-      "cobertura_rede": "3G",
-      "indicadores": { "emprego": 0.48, "saude_mental": null }
+      "origem": "ESTREITO_CAPOEIRAS",
+      "destino": "CBD_BEIRAMAR",
+      "municipio_origem": "Florianópolis",   // pode ser null (ausentes reais no OD)
+      "municipio_destino": "Florianópolis",
+      "lat_origem": -27.588,
+      "lng_origem": -48.585,
+      "lat_destino": -27.5954,
+      "lng_destino": -48.548,
+      "viagens": 28288,
+      "usuarios": 24705,
+      "dist_km": 3.74,
+      "periodo": "NOITE",                    // período predominante do fluxo
+      "mesmo_cluster": false                 // true = fluxo interno (não vira linha)
     }
   ]
 }
 ```
+
+---
+
+## `GET /api/v1/mapa/overview`
+
+Referencial de bairros × monitoramento: **todos os 56 bairros** de Florianópolis
+(GeoJSON OSM, o mesmo do front) — cada um marcado como monitorado (com as zonas
+Vísent que o cobrem) ou **vazio**. O front só separa preenchido × vazio pra pintar
+o mapa. Zonas do continente (São José/Palhoça/Biguaçu) não têm bairro no
+referencial e vêm na lista separada, com centroide pra virar pin.
+
+### Query params
+Nenhum (o cruzamento é fixo, cacheado no backend).
+
+### Response 200
+```json
+{
+  "tipo": "overview",
+  "total_antenas": 132,
+  "dados": [
+    { "bairro": "Trindade", "monitorado": true,  "zonas": ["TRINDADE"], "antenas": 3 },
+    { "bairro": "Daniela",  "monitorado": false, "zonas": [],           "antenas": 0 }
+  ],
+  "zonas_fora_referencial": [
+    { "zona": "SAO_JOSE_KOBRASOL", "municipio": "Sao Jose", "lat": -27.5942, "lng": -48.6266, "antenas": 9 }
+  ]
+}
+```
+
+- `zonas` = zonas que cobrem o bairro (match por nome normalizado **ou** antena
+  dentro do polígono — bairro com antena dentro nunca fica "não monitorado").
+- `antenas` = antenas fisicamente dentro do polígono do bairro.
 
 ---
 
@@ -142,5 +225,7 @@ Dados georreferenciados para renderizar o mapa.
 - **Formato:** JSON, UTF-8. Campos em `snake_case` no backend.
 - **CORS:** o backend libera a origem do frontend (Vite em `http://localhost:5173`).
 - **Versionamento:** mudanças no contrato → avisar o time e atualizar este arquivo.
-- **Tipos espelhados:** Pydantic (backend, `app/models.py`) e TypeScript (frontend,
-  `src/api/types.ts`) devem refletir exatamente os schemas acima.
+- **Tipos espelhados:** Pydantic (backend, `app/schemas/dados.py`) e TypeScript (frontend,
+  `src/types/index.ts` + mapeamento PT→EN em `src/api/endpoints.ts`) devem refletir os schemas acima.
+- **Camadas do mapa no front (lazy por filtro):** `/mapa/overview` (tema inicial) · `/mapa/rede` · `/mapa/mobilidade`
+  — cada filtro só chama sua rota quando ativo. Detalhes de renderização em `skills/frontend.md § Mapa temático`.
