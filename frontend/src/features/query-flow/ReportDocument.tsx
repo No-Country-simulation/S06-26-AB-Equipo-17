@@ -14,6 +14,8 @@ export type ReportLabels = {
   meta: string;
   question: string;
   answer: string;
+  /** Rótulo já resolvido do nível de confiança (ex.: "Confiança baixa"). */
+  confidence: string;
   evidence: string;
   colData: string;
   colValue: string;
@@ -33,6 +35,13 @@ const MUTED = "#6e7178";
 const LINE = "#e6e7ec";
 const LINE_SOFT = "#f0f1f4";
 const PRIMARY = "#2f6bff";
+
+/** Cores da pílula de confiança — mesmos tons do AlertBadge (colors.css). */
+const CONFIDENCE_COLORS: Record<QueryResult["confidence"], { bg: string; fg: string }> = {
+  high: { bg: "#d8f0dd", fg: "#41be5b" },
+  medium: { bg: "#f4c430", fg: INK },
+  low: { bg: "#ee4732", fg: "#ffffff" },
+};
 
 const s = StyleSheet.create({
   page: { padding: 40, fontSize: 10, color: INK, fontFamily: "Helvetica" },
@@ -65,6 +74,17 @@ const s = StyleSheet.create({
   cPeriod: { width: "18%" },
   tdStrong: { fontFamily: "Helvetica-Bold" },
   tdMuted: { color: MUTED },
+  confidence: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    borderRadius: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    fontSize: 8,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontFamily: "Helvetica-Bold",
+  },
   source: { marginTop: 3, fontSize: 9, color: MUTED },
 });
 
@@ -81,6 +101,17 @@ export function ReportDocument({ labels, question, result }: ReportDocumentProps
 
         <Text style={s.sectionLabel}>{labels.answer}</Text>
         <Text style={s.claim}>{result.claim}</Text>
+        <Text
+          style={[
+            s.confidence,
+            {
+              backgroundColor: CONFIDENCE_COLORS[result.confidence].bg,
+              color: CONFIDENCE_COLORS[result.confidence].fg,
+            },
+          ]}
+        >
+          {labels.confidence}
+        </Text>
 
         <Text style={s.sectionLabel}>{labels.evidence}</Text>
         <View style={s.table}>

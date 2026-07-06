@@ -57,6 +57,7 @@ export function ExportStep({ question, result }: ExportStepProps) {
             meta: t("export.printMeta", { date: generatedAt }),
             question: t("export.printQuestion"),
             answer: t("export.printAnswer"),
+            confidence: t(`result.confidence.${result.confidence}`),
             evidence: t("result.evidence"),
             colData: t("result.colData"),
             colValue: t("result.colValue"),
