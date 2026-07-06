@@ -9,66 +9,92 @@
 
 ## 🧩 O problema que resolvemos
 
-Gestores públicos não têm acesso fácil a dados cruzados de mobilidade urbana, emprego e saúde mental por região para basear políticas de inclusão social em evidências reais.
+Gestores públicos não têm acesso fácil a dados cruzados por região para basear políticas de inclusão social em evidências reais.
 
-Nossa solução é uma Web App Responsiva (PWA) com agente de IA que responde consultas em linguagem natural usando o dataset Vísent CDRView — dados reais de concentração de pessoas e cobertura de rede por região.
+Nossa solução é uma Web App responsiva (PWA) com agente de IA que responde consultas em linguagem natural sobre o dataset **Vísent CDRView** (Grande Florianópolis): **concentração de pessoas × qualidade de rede × faixa de renda** por zona, mais **fluxos de mobilidade** origem→destino — tudo dado real, com resposta em formato de "paper" (afirmação + evidências + fontes + nível de confiança).
+
+---
+
+## 🛠️ Stack
+
+| Camada | Tecnologias |
+|---|---|
+| Backend | Python 3.12 · **FastAPI** + Pydantic · pandas (agregação em memória) · **Google Gemini** (`google-genai`, `gemini-3.5-flash`) · uvicorn |
+| Frontend | **React 19** + Vite 8 + TypeScript · Tailwind v4 · Leaflet/react-leaflet (mapa temático) · react-i18next (**pt-BR/en/es**) · PWA (`vite-plugin-pwa`) · `@react-pdf/renderer` (export) |
+| Qualidade | Ruff + pytest (CI GitHub Actions) · ESLint + `tsc -b` |
+| Deploy | Render (2 serviços via `render.yaml`: API + site estático) |
+
+Detalhes e decisões: [`skills/backend.md`](./skills/backend.md) · [`skills/frontend.md`](./skills/frontend.md) · [`docs/decisoes-tecnicas.md`](./docs/decisoes-tecnicas.md)
 
 ---
 
 ## 🚀 Como rodar o projeto localmente
 
 ### Pré-requisitos
-- Node.js 18+ ou Python 3.10+
+- Node.js 20.19+ (ou 22.12+) — exigido pelo Vite 8
+- Python 3.12+
 - Git
 
-### Frontend
+### Backend (FastAPI)
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+cp .env.example .env           # opcional — sem AI_API_KEY a IA responde com confiança baixa (sem 500)
+uvicorn app.main:app --reload  # http://localhost:8000/docs (Swagger)
+```
+
+### Frontend (React + Vite)
 ```bash
 cd frontend
 npm install
-npm run dev
-```
-
-### Backend
-```bash
-cd backend
-npm install        # ou: pip install -r requirements.txt
-cp .env.example .env
-# preencha as variáveis no .env
-npm start          # ou: uvicorn app.main:app --reload
+npm run dev                    # http://localhost:5173
 ```
 
 ---
 
 ## ⚙️ Variáveis de ambiente
 
-Crie um arquivo `.env` baseado no `.env.example`:
+Backend (`backend/.env`, baseado no `backend/.env.example`):
 
 ```
-# Backend
-PORT=3000
-AI_API_KEY=sua_chave_aqui
-
-# Frontend
-VITE_API_URL=http://127.0.0.1:8000
+AI_API_KEY=sua_chave_do_gemini   # NUNCA commitar; em prod vai no painel do Render
+AI_MODEL=gemini-3.5-flash
+FRONTEND_ORIGIN=http://localhost:5173   # CORS
 ```
+
+Frontend (`frontend/.env`):
+
+```
+VITE_API_URL=http://localhost:8000   # host puro, sem /api/v1
+```
+
+⚠️ O Vite embute o env no **build** — mudou `VITE_API_URL`, tem que rebuildar.
 
 ---
 
-## 📡 Endpoints principais
+## 📡 Endpoints (tudo sob `/api/v1`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| POST | `/dados` | Consulta ao agente de IA em linguagem natural |
-| GET | `/mapa` | Dados de concentração por região (Vísent CDRView) |
-| GET | `/health` | Status da API |
+| GET | `/api/v1/health` | Status da API (health check do Render) |
+| POST | `/api/v1/dados` | Consulta ao agente de IA em linguagem natural → "paper" |
+| GET | `/api/v1/mapa` | Pins de concentração por zona (mantido pelo contrato) |
+| GET | `/api/v1/mapa/rede` | Qualidade de rede por zona (congestionamento; `sem_dados`) |
+| GET | `/api/v1/mapa/mobilidade` | Fluxos origem→destino (`?regiao=` filtra; sem filtro = 80 maiores) |
+| GET | `/api/v1/mapa/overview` | 56 bairros de Floripa × status de monitoramento |
+
+Contrato completo: [`docs/contrato-integracao.md`](./docs/contrato-integracao.md) · Swagger em `/docs`
 
 ### Exemplo de uso
 
 ```bash
-POST /dados
+POST /api/v1/dados
 {
-  "consulta": "Onde faltam programas de formação para jovens de baixa renda?",
-  "filtros": { "regiao": "Sudeste", "indicador": "emprego" }
+  "consulta": "Onde há mais congestionamento e queda de chamadas?",
+  "idioma": "pt",
+  "filtros": { "regiao": "São José" }   # opcional — município ou zona da Grande Floripa
 }
 ```
 
@@ -76,21 +102,37 @@ POST /dados
 
 ## 📊 Dataset Vísent CDRView
 
-Dados de concentração de pessoas por zona + cobertura de rede ERB (5G/4G/3G) com coordenadas reais de antenas Anatel.
+Grande Florianópolis: **132 ERBs reais** (coordenadas Anatel), 27 zonas (clusters), 7 municípios, 15 dias. Dados sintéticos sobre antenas reais.
 
-Disponível em: [github.com/wongola-bit/appbit-hackathon](https://github.com/wongola-bit/appbit-hackathon)
+- Indicadores: concentração de pessoas (`n_usuarios`), qualidade de rede (proxies `congestionamento_medio`/`drop_pct_medio`), faixa de renda (`income_cluster`) e fluxos origem→destino.
+- Os CSVs agregados (~3 MB) ficam **commitados em `backend/dataset/`** (o deploy lê de lá); os tensores de GB são proibidos no repo (`.gitignore`).
+- Dicionário de colunas completo: [`docs/dados-visent.md`](./docs/dados-visent.md)
 
-Consulte o `dataset/README.md` para o dicionário de colunas completo.
+Fonte: [github.com/wongola-bit/appbit](https://github.com/wongola-bit/appbit) (pasta `dataset-visent/`)
 
 ---
 
 ## 🏗️ Arquitetura
 
 ```
-[PWA Frontend] → [API REST] → [Agente IA] → [Dataset Vísent]
+[PWA React] → [API FastAPI /api/v1] → [data service (pandas)] ┐
+                                      [ai service (prompt)] → [Gemini]
 ```
 
-Veja detalhes em `docs/arquitetura.md`
+O agente de IA recebe os dados **agregados e rotulados** no prompt e responde ancorado neles (não inventa números). Detalhes em [`docs/arquitetura.md`](./docs/arquitetura.md) e [`docs/agente-ia.md`](./docs/agente-ia.md).
+
+---
+
+## 🚢 Deploy (Render)
+
+Dois serviços definidos em [`render.yaml`](./render.yaml):
+
+| Serviço | Tipo | Config |
+|---|---|---|
+| Backend | Web Service | root `backend` · `uvicorn app.main:app --host 0.0.0.0 --port $PORT` · health `/api/v1/health` |
+| Frontend | Static Site | root `frontend` · build `npm install && npm run build` · publish `dist` |
+
+Guia completo: [`docs/deploy.md`](./docs/deploy.md)
 
 ---
 
@@ -98,20 +140,22 @@ Veja detalhes em `docs/arquitetura.md`
 
 | Nome | Perfil | GitHub |
 |------|--------|--------|
-| Kainã Lourenço | Frontend Developer | [@kainaalourenco](https://github.com/kainaalourenco) |
 | Leonardo Behnck | Mobile Developer | [@leonardobehnck](https://github.com/leonardobehnck) |
 | Noelia Daiana Limp Arriola | UX/UI Designer | [@noeliaarriola](https://github.com/noeliaarriola) |
 | Thayssa Neves | Backend Developer | [@RodaThay](https://github.com/RodaThay) |
 
 ---
 
-## 📋 Progresso
+## 📋 Estado do MVP
 
-- [ ] Semana 1 — Setup do projeto e contrato de integração
-- [ ] Semana 2 — Primeiros endpoints e telas funcionando
-- [ ] Semana 3 — Deploy inicial + pipeline do dataset Vísent
-- [ ] Semana 4 — MVP completo
-- [ ] Semana 5 — Pitch e Demo Day
+- [x] API em camadas (FastAPI) com dado real do Vísent + agente Gemini ancorado
+- [x] Endpoints no ar: `/health` · `/dados` · `/mapa` + `rede`/`mobilidade`/`overview`
+- [x] Mapa temático de Floripa com 3 camadas reais (visão geral, rede, mobilidade — fetch lazy por filtro)
+- [x] Fluxo de consulta à IA em modal (pergunta → paper → export **PDF**)
+- [x] i18n em 3 idiomas (pt-BR/en/es) + PWA instalável
+- [x] CI (Ruff + pytest) e deploy configurado no Render
+- [x] Plugar `AI_API_KEY` de produção e validar ao vivo
+- [ ] Página de alertas (placeholder) · dashboards Analytics/Reports com dado real
 
 ---
 
@@ -119,4 +163,4 @@ Veja detalhes em `docs/arquitetura.md`
 
 - Discord do hackathon: [discord.gg/7gBYpXCh3j](https://discord.gg/7gBYpXCh3j)
 - Brief completo: [github.com/wongola-bit/appbit-hackathon](https://github.com/wongola-bit/appbit-hackathon)
-- Dataset Vísent: [github.com/wongola-bit/appbit-hackathon](https://github.com/wongola-bit/appbit-hackathon)
+- Dataset Vísent: [github.com/wongola-bit/appbit](https://github.com/wongola-bit/appbit)
