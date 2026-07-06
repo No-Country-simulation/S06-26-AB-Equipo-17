@@ -42,6 +42,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 cp .env.example .env           # opcional — sem AI_API_KEY a IA responde com confiança baixa (sem 500)
+python -m scripts.ingest       # opcional — pipeline ETL: valida e gera dataset/processed/concentracao.parquet
 uvicorn app.main:app --reload  # http://localhost:8000/docs (Swagger)
 ```
 
@@ -149,6 +150,7 @@ Guia completo: [`docs/deploy.md`](./docs/deploy.md)
 ## 📋 Estado do MVP
 
 - [x] API em camadas (FastAPI) com dado real do Vísent + agente Gemini ancorado
+- [x] Pipeline de ingestão do Vísent funcional (`python -m scripts.ingest` → Parquet validado, carregado no startup)
 - [x] Endpoints no ar: `/health` · `/dados` · `/mapa` + `rede`/`mobilidade`/`overview`
 - [x] Mapa temático de Floripa com 3 camadas reais (visão geral, rede, mobilidade — fetch lazy por filtro)
 - [x] Fluxo de consulta à IA em modal (pergunta → paper → export **PDF**)

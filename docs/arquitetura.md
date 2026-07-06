@@ -73,7 +73,7 @@ appbit-17/
 │   ├── requirements.txt
 │   ├── .env.example
 │   ├── dataset/               ← CSVs agregados do Vísent (tensores de GB no .gitignore)
-│   ├── scripts/ingest.py      ← pipeline ETL (CSV → Parquet)  [a criar]
+│   ├── scripts/ingest.py      ← pipeline ETL (CSV → Parquet validado)
 │   ├── tests/                 ← smoke tests
 │   └── app/
 │       ├── main.py            ← create_app(): CORS + router

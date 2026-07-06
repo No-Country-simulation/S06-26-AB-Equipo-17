@@ -1,8 +1,10 @@
 """Concentração + qualidade de rede + renda (tensor_concentracao.csv + assinantes.csv).
 
-No 1º acesso, agrega por município/cluster/período, cruza a renda e cacheia em
-memória; `buscar()` filtra esse DataFrame. Quando o `scripts/ingest.py` gerar o
-Parquet, basta trocar o `_carregar()` por `pd.read_parquet(...)` — o resto não muda.
+No 1º acesso carrega o agregado por município/cluster/período (com renda) e
+cacheia em memória; `buscar()` filtra esse DataFrame. Se o Parquet do pipeline
+(`python -m scripts.ingest`) existir, carrega dele direto; senão agrega dos CSVs.
+⚠️ Mudou regra de agregação ou CSV? Re-rode o ingest — o teste de frescor em
+tests/test_ingest.py acusa Parquet desatualizado.
 
 O CSV é por (antena, dia, período) e um cluster tem várias antenas (mediana 6,
 até 13), então a forma de agregar importa — cada regra vive na sua função.
@@ -16,6 +18,7 @@ from app.services.dados.base import DATASET, filtrar_e_serializar, normalizar
 
 CONCENTRACAO_CSV = DATASET / "tensor_concentracao.csv"
 ASSINANTES_CSV = DATASET / "assinantes.csv"
+PROCESSED_PARQUET = DATASET / "processed" / "concentracao.parquet"
 
 _ZONA = ["municipio", "cluster", "periodo"]
 
@@ -95,6 +98,9 @@ def _carregar() -> pd.DataFrame:
 
 @lru_cache(maxsize=1)
 def _dados() -> pd.DataFrame:
+    """Prefere o Parquet materializado pelo ingest; sem ele, agrega dos CSVs."""
+    if PROCESSED_PARQUET.exists():
+        return pd.read_parquet(PROCESSED_PARQUET)
     return _carregar() if CONCENTRACAO_CSV.exists() else pd.DataFrame()
 
 

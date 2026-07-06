@@ -10,11 +10,12 @@ Frente responsável: **Dados/Pipeline (frente 1)**.
 > roda **uma vez** (offline/no startup), produz dados limpos, e o `data_service` filtra
 > esses dados a cada pergunta. Ver [agente-ia.md](./agente-ia.md) e [dados-visent.md](./dados-visent.md).
 
-> ⚠️ **Status (2026-07-06):** o `scripts/ingest.py` **ainda não existe**. Hoje o `data_service`
-> (`app/services/dados/`) lê os CSVs direto de `backend/dataset/` no startup e agrega em memória
-> com as regras validadas da Etapa 3 abaixo (fonte da verdade: `app/services/dados/concentracao.py`).
-> Este documento segue como desenho do upgrade CSV → Parquet: quando o ingest existir,
-> troca-se só o `_carregar()` do data service.
+> ✅ **Status (2026-07-06): implementado** — `backend/scripts/ingest.py` (rodar de `backend/`:
+> `python -m scripts.ingest`). A transformação é importada de `app/services/dados/concentracao.py`
+> (fonte da verdade — as regras da Etapa 3 abaixo); o script confere os brutos, valida o agregado
+> e grava `dataset/processed/concentracao.parquet` (~9 kB). O `data_service` **prefere o Parquet**
+> no startup e cai pros CSVs se ele não existir. Testes em `backend/tests/test_ingest.py`
+> (ponta a ponta + guarda de frescor do Parquet commitado).
 
 ## Visão geral (ETL)
 
@@ -167,51 +168,28 @@ O `data_service` carrega esse arquivo **uma vez no startup** do FastAPI e manté
 
 ---
 
-## Esqueleto do `scripts/ingest.py`
+## Implementação — `backend/scripts/ingest.py`
 
-```python
-"""Pipeline de ingestão Vísent CDRView: Extract -> Transform -> Validate -> Load.
-Rodar a partir de backend/: python -m scripts.ingest
-"""
-from pathlib import Path
-import pandas as pd
+O script real tem **uma função por etapa**, com saída de progresso no terminal:
 
-RAW = Path("dataset")              # rodar de dentro de backend/
-OUT = Path("dataset/processed")
+- `extrair()` — Extract: confere que os CSVs crus estão em `dataset/` (erro claro se faltar).
+- `perfilar()` — Profiling: conferência dos brutos — contagens (~7.920 / ~200.000), períodos
+  válidos, `n_usuarios` sem nulos.
+- `transformar()` — Transform: **importa o `_carregar()` do data service** (fonte única das
+  regras da Etapa 3 — o script não duplica regra de agregação).
+- `validar(agregado)` — Validate: colunas esperadas, sem nulos-chave, sem zona×período duplicado,
+  períodos válidos, *bounding box* de Floripa, `renda_baixa_pct` 0–100, cobertura do join de renda.
+- `gravar(agregado)` — Load: `dataset/processed/concentracao.parquet` (~9 kB, 96 linhas).
 
-def carregar(nome: str) -> pd.DataFrame:
-    df = pd.read_csv(RAW / nome, dtype={"ecgi": str})
-    df.columns = df.columns.str.strip().str.lower()
-    return df
-
-def transformar(conc: pd.DataFrame, assinantes: pd.DataFrame) -> pd.DataFrame:
-    """Mesmas regras de app/services/dados/concentracao.py (fonte da verdade — ver Etapa 3):
-    concentração = soma entre antenas → média entre dias; taxas ponderadas por n_usuarios;
-    renda = renda_baixa_pct (%C+D) com join por chave normalizada (sem acento).
-    Ideal: extrair/importar essas funções do data service em vez de duplicar a lógica."""
-    ...
-
-def validar(df: pd.DataFrame) -> None:
-    assert df["concentracao"].notna().all(), "há linhas sem concentração"
-    assert df["lat"].between(-28.0, -27.2).all(), "lat fora de Florianópolis"
-    # ... demais checagens
-
-def main() -> None:
-    conc = carregar("tensor_concentracao.csv")
-    assinantes = carregar("assinantes.csv")
-    resultado = transformar(conc, assinantes)
-    validar(resultado)
-    OUT.mkdir(parents=True, exist_ok=True)
-    resultado.to_parquet(OUT / "concentracao.parquet", index=False)
-    print(f"OK — {len(resultado)} linhas processadas")
-
-if __name__ == "__main__":
-    main()
-```
+Qualquer checagem que falhe → `SystemExit` com mensagem clara (exit code ≠ 0 — para em CI/build).
+Testes em `backend/tests/test_ingest.py`: pipeline ponta a ponta (Parquet ≡ agregação fresca),
+validação barrando agregado quebrado, `data_service` preferindo o Parquet, e a **guarda de
+frescor** — se o Parquet commitado divergir da agregação atual dos CSVs, o CI acusa.
 
 ## Quando rodar o pipeline
 
-- **Local:** uma vez, ao baixar o dataset (e de novo se mudar a transformação).
+- **Local:** uma vez, ao baixar o dataset — e **de novo sempre que mudar um CSV ou uma regra de
+  agregação** (o teste de frescor no CI acusa Parquet desatualizado).
 - **No deploy:** como o `processed/*.parquet` é commitado, **não precisa** rodar no Render.
   (Alternativa: rodar no `buildCommand`, mas adiciona dependência — preferimos commitar.)
 
