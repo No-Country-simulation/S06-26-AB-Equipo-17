@@ -1,8 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { Zap } from "lucide-react";
+import { AlertBadge, type AlertStatus } from "@/components/AlertBadge";
 import { Button } from "@/components/Button";
 import { DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { QueryResult } from "@/types";
+import type { ConfidenceLevel, QueryResult } from "@/types";
+
+/* Nível de confiança → status do AlertBadge (cor/ícone do DS). */
+const CONFIDENCE_STATUS: Record<ConfidenceLevel, AlertStatus> = {
+  high: "success",
+  medium: "warning",
+  low: "critical",
+};
 
 export type ResultStepProps = {
   /** Pergunta do usuário (subtítulo). */
@@ -27,10 +35,15 @@ export function ResultStep({ question, result, onRefine, onExport }: ResultStepP
 
       <hr className="border-line" />
 
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
-        <Zap size={14} />
-        {t("result.meta", { time: result.responseTime, count: result.sources.length })}
-      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-pill bg-success-soft px-3 py-1 text-label font-medium text-success">
+          <Zap size={14} />
+          {t("result.meta", { time: result.responseTime, count: result.sources.length })}
+        </span>
+        <AlertBadge status={CONFIDENCE_STATUS[result.confidence]}>
+          {t(`result.confidence.${result.confidence}`)}
+        </AlertBadge>
+      </div>
 
       {/* Afirmação principal */}
       <p className="border-l-4 border-primary pl-4 text-body-lg text-ink">{result.claim}</p>

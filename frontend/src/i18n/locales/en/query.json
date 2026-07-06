@@ -30,6 +30,11 @@
   "result": {
     "title": "Analysis result",
     "meta": "Answer in {{time}} · {{count}} sources queried",
+    "confidence": {
+      "high": "High confidence",
+      "medium": "Medium confidence",
+      "low": "Low confidence"
+    },
     "evidence": "Evidence",
     "colData": "Metric",
     "colValue": "Value",

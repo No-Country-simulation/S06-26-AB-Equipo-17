@@ -30,6 +30,11 @@
   "result": {
     "title": "Resultado del análisis",
     "meta": "Respuesta en {{time}} · {{count}} fuentes consultadas",
+    "confidence": {
+      "high": "Confianza alta",
+      "medium": "Confianza media",
+      "low": "Confianza baja"
+    },
     "evidence": "Evidencia",
     "colData": "Dato",
     "colValue": "Valor",
