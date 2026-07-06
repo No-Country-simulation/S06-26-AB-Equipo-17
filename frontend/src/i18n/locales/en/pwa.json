@@ -1,0 +1,9 @@
+{
+  "install": "Install app",
+  "iosTitle": "Install App BiT",
+  "iosIntro": "On iPhone/iPad, install from Safari:",
+  "iosStep1": "Tap Share (the square with an up arrow).",
+  "iosStep2": "Scroll the list and tap \"Add to Home Screen\".",
+  "iosStep3": "Confirm with \"Add\" — App BiT becomes an app on your screen.",
+  "gotIt": "Got it"
+}

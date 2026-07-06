@@ -1,0 +1,9 @@
+{
+  "install": "Instalar app",
+  "iosTitle": "Instalar o App BiT",
+  "iosIntro": "No iPhone/iPad a instalação é feita pelo Safari:",
+  "iosStep1": "Toque em Compartilhar (o quadrado com seta para cima).",
+  "iosStep2": "Role a lista e toque em \"Adicionar à Tela de Início\".",
+  "iosStep3": "Confirme em \"Adicionar\" — o App BiT vira um app na sua tela.",
+  "gotIt": "Entendi"
+}

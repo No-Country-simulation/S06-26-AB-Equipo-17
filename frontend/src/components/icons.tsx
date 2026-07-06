@@ -10,4 +10,5 @@ export {
   FileText as DocIcon,
   Bell as BellIcon,
   Settings as GearIcon,
+  Download as InstallIcon,
 } from "lucide-react";

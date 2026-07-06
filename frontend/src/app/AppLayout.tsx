@@ -8,6 +8,7 @@ import { SideAppBar, type SideNavItem } from "../components/SideAppBar";
 import { TopAppBar } from "../components/TopAppBar";
 import { BarsIcon, BellIcon, DocIcon, GearIcon, PinIcon } from "../components/icons";
 import { NotificationsPanel } from "../features/notifications";
+import { InstallAppButton } from "../features/pwa-install";
 import { SettingsPanel } from "../features/settings";
 import { PageFallback } from "./PageFallback";
 
@@ -60,6 +61,7 @@ export function AppLayout() {
         title={current?.label}
         actions={
           <>
+            <InstallAppButton />
             <IconButton variant="ghost" label={t("settings")} onClick={() => setSettingsOpen(true)}>
               <GearIcon />
             </IconButton>

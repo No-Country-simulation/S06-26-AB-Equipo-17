@@ -9,6 +9,7 @@ import type analytics from "./locales/pt-BR/analytics.json";
 import type map from "./locales/pt-BR/map.json";
 import type reports from "./locales/pt-BR/reports.json";
 import type alerts from "./locales/pt-BR/alerts.json";
+import type pwa from "./locales/pt-BR/pwa.json";
 
 /** Tipa as chaves de tradução → o `tsc -b` quebra em chave inexistente (pt-BR = fonte). */
 declare module "i18next" {
@@ -25,6 +26,7 @@ declare module "i18next" {
       map: typeof map;
       reports: typeof reports;
       alerts: typeof alerts;
+      pwa: typeof pwa;
     };
   }
 }
