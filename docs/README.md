@@ -16,6 +16,7 @@ Documentação técnica do **Painel de Dados Públicos com IA**.
 | [agente-ia.md](./agente-ia.md) | Design do agente de IA (service + gateway Gemini) e desafios de produção |
 | [dados-visent.md](./dados-visent.md) | O que é o dataset Vísent CDRView e o que usamos no MVP |
 | [pipeline-dados.md](./pipeline-dados.md) | Pipeline ETL de ingestão do Vísent (extract → transform → validate → load) |
+| [i18n.md](./i18n.md) | Internacionalização do frontend (pt-BR/en/es) — ADR-015..017 |
 | [deploy.md](./deploy.md) | Deploy do monorepo no Render (2 apps, 1 repo) + pegadinhas de CORS/Vite |
 | [divisao-tarefas.md](./divisao-tarefas.md) | Divisão das 6 frentes de trabalho |
 | [_tarefa1.md](./_tarefa1.md) | Documento de entrega da Tarefa 1 (resumo do projeto + links) |
