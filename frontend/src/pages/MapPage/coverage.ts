@@ -26,8 +26,10 @@ export type CoverageZone = {
   label: string;
   lat: number;
   lng: number;
-  /** Maior leitura de usuários entre os períodos da zona. */
+  /** Maior leitura entre os períodos da zona (0 se a zona não tem dado). */
   peak: number;
+  /** Zona sem dado de rede (todas as leituras `sem_dados`) → pin vermelho. */
+  noData: boolean;
 };
 
 /** Siglas do dataset que ficam em caixa alta no rótulo. */
@@ -67,12 +69,16 @@ export function toCoverageZones(points: MapPoint[]): CoverageZone[] {
     }
     const anchor = [...freq.values()].sort((a, b) => b.count - a.count)[0].point;
 
+    // Leituras válidas (não-nulas); zona sem nenhuma = sem dado de rede.
+    const values = list.map((point) => point.value).filter((v): v is number => v != null);
+
     return {
       region,
       label: zoneLabel(region),
       lat: anchor.lat,
       lng: anchor.lng,
-      peak: Math.max(...list.map((point) => point.value)),
+      peak: values.length ? Math.max(...values) : 0,
+      noData: values.length === 0 || list.every((point) => point.noData),
     };
   });
 }
@@ -153,7 +159,9 @@ export function toBairroKpis(points: MapPoint[], bairros: FeatureCollection): Ba
   const peaks = new Map<string, number>();
   for (const [region, list] of groupByRegion(points)) {
     const coords: Position[] = list.map((point) => [point.lng, point.lat]);
-    const peak = Math.max(...list.map((point) => point.value));
+    const values = list.map((point) => point.value).filter((v): v is number => v != null);
+    if (values.length === 0) continue; // zona sem dado de rede → sem card
+    const peak = Math.max(...values);
 
     const spatial = features.filter((b) => coords.some((c) => inGeometry(c, b.geometry)));
     if (spatial.length === 0) continue; // zona do continente

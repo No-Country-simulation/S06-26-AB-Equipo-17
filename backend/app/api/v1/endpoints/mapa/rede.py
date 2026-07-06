@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from app.schemas.dados import PontoMapa, Visualizacao
-from app.services.dados.concentracao import buscar
+from app.services.dados import buscar
 
 router = APIRouter()
 

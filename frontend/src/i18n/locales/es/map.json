@@ -6,17 +6,20 @@
     "health": "Salud",
     "housing": "Vivienda",
     "employment": "Empleo",
-    "network": "Cobertura de Red"
+    "network": "Cobertura de Red",
+    "mobility": "Movilidad"
   },
   "coverage": {
     "pinLabel": "Zona monitoreada",
-    "peakLabel": "Pico de usuarios conectados"
+    "congestionLabel": "Congestión de red",
+    "noDataLabel": "Sin datos de red"
+  },
+  "mobility": {
+    "tripsLabel": "Total de viajes (origen + destino)"
   },
   "legend": {
-    "title": "Capas activas",
-    "fullCoverage": "Cobertura total",
+    "title": "Leyenda",
     "monitoring": "En monitoreo",
-    "highCriticality": "Alta criticidad",
     "noCoverage": "Sin cobertura"
   }
 }

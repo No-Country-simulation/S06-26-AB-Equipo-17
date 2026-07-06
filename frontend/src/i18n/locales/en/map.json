@@ -6,17 +6,20 @@
     "health": "Health",
     "housing": "Housing",
     "employment": "Employment",
-    "network": "Network Coverage"
+    "network": "Network Coverage",
+    "mobility": "Mobility"
   },
   "coverage": {
     "pinLabel": "Monitored zone",
-    "peakLabel": "Peak connected users"
+    "congestionLabel": "Network congestion",
+    "noDataLabel": "No network data"
+  },
+  "mobility": {
+    "tripsLabel": "Total trips (origin + destination)"
   },
   "legend": {
-    "title": "Active layers",
-    "fullCoverage": "Full coverage",
+    "title": "Legend",
     "monitoring": "Monitoring",
-    "highCriticality": "High criticality",
     "noCoverage": "No coverage"
   }
 }

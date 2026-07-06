@@ -11,15 +11,61 @@ export type HealthStatus = {
 };
 
 /**
- * GET /mapa — pontos georreferenciados das zonas monitoradas (Vísent).
- * O backend devolve o schema `Visualizacao` (mesmo do `visualizacao` do
- * POST /dados): ~4 leituras por zona (períodos do dia, sem rótulo no
- * payload) com a coordenada da antena agregadora. Quem agrega por zona
- * é a página (ver pages/MapPage/coverage.ts).
+ * GET /mapa/rede — cobertura/qualidade de rede por zona monitorada (Vísent).
+ * Backend devolve o schema `Visualizacao` (mesmo do `visualizacao` do POST
+ * /dados): ~4 leituras por zona (períodos do dia, sem rótulo no payload) com a
+ * coordenada da antena agregadora; `value` = congestionamento (pode ser `null`)
+ * e `noData` = zona sem dado de rede (pin vermelho). Agrega por zona a página
+ * (ver pages/MapPage/coverage.ts).
  */
 export type MapData = {
   type: string;
   points: MapPoint[];
+};
+
+/**
+ * GET /mapa/mobilidade — fluxos origem→destino (OD por cluster) do backend
+ * (schema `VisualizacaoFluxos`), já mapeado pro domínio EN (ver `api/endpoints`).
+ * Coordenadas/valores podem ser `null` (ausentes reais no OD). `sameCluster`
+ * = fluxo interno (origem = destino no mapa) → não vira linha.
+ */
+export type MobilityFlow = {
+  origin: string;
+  destination: string;
+  originCity: string | null;
+  destinationCity: string | null;
+  originLat: number | null;
+  originLng: number | null;
+  destinationLat: number | null;
+  destinationLng: number | null;
+  trips: number | null;
+  users: number | null;
+  distanceKm: number | null;
+  period: string | null;
+  sameCluster: boolean | null;
+};
+
+export type MobilityData = {
+  type: string;
+  flows: MobilityFlow[];
+};
+
+/**
+ * GET /mapa/overview — referencial de bairros × monitoramento (schema
+ * `VisualizacaoOverview`), mapeado pro domínio EN. Por bairro: se é monitorado
+ * (tem zonas Vísent), quais zonas e quantas antenas dentro do polígono.
+ */
+export type BairroMonitoring = {
+  bairro: string;
+  monitored: boolean;
+  zones: string[];
+  antennas: number;
+};
+
+export type OverviewData = {
+  type: string;
+  totalAntennas: number;
+  bairros: BairroMonitoring[];
 };
 
 /**
@@ -62,12 +108,15 @@ export type Source = {
   type: string;
 };
 
-/** Ponto da visualização no mapa (visualizacao.dados[]). */
+/** Ponto da visualização no mapa (visualizacao.dados[] / PontoMapa). */
 export type MapPoint = {
   region: string;
   lat: number;
   lng: number;
-  value: number;
+  /** Valor da leitura (ex.: congestionamento no /mapa/rede) — `null` = ausente. */
+  value: number | null;
+  /** Zona sem dado de rede (backend `sem_dados`) → pin vermelho. */
+  noData: boolean;
 };
 
 /** Visualização sugerida pela resposta (visualizacao). */

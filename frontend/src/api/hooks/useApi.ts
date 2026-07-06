@@ -17,17 +17,24 @@ export type AsyncState<T> = State<T> & {
 };
 
 /**
- * @param fn   função que faz a chamada (ex.: () => getMapData()).
- * @param deps dependências que, ao mudar, refazem a chamada.
+ * @param fn      função que faz a chamada (ex.: () => getMapNetwork()).
+ * @param deps    dependências que, ao mudar, refazem a chamada.
+ * @param enabled só busca quando `true` (fetch LAZY — ex.: camada do mapa que
+ *                só carrega quando o filtro é selecionado). Default `true`.
  *
  * Os setState ficam só nos callbacks async e no refetch (nunca no corpo
  * do effect) — exigência do lint react-hooks/set-state-in-effect.
  */
-export function useApi<T>(fn: () => Promise<T>, deps: unknown[] = []): AsyncState<T> {
-  const [state, setState] = useState<State<T>>({ data: null, loading: true, error: null });
+export function useApi<T>(
+  fn: () => Promise<T>,
+  deps: unknown[] = [],
+  enabled: boolean = true,
+): AsyncState<T> {
+  const [state, setState] = useState<State<T>>({ data: null, loading: enabled, error: null });
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
 
     fn()
@@ -43,7 +50,7 @@ export function useApi<T>(fn: () => Promise<T>, deps: unknown[] = []): AsyncStat
     };
     // fn é recriada a cada render; controlamos via deps explícitas + reloadKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [...deps, reloadKey]);
+  }, [...deps, reloadKey, enabled]);
 
   /** Refaz a chamada (marca loading antes — fora do effect, permitido). */
   const refetch = () => {
