@@ -40,6 +40,18 @@ def test_data_service_prefere_o_parquet(tmp_path, monkeypatch):
         concentracao._dados.cache_clear()  # não poluir os outros testes com o marcador
 
 
+def test_parquet_corrompido_cai_pros_csvs(tmp_path, monkeypatch):
+    # Parquet ilegível não pode derrubar a API: _dados() deve agregar dos CSVs (fallback)
+    corrompido = tmp_path / "concentracao.parquet"
+    corrompido.write_bytes(b"isto nao e um parquet")
+    monkeypatch.setattr(concentracao, "PROCESSED_PARQUET", corrompido)
+    concentracao._dados.cache_clear()
+    try:
+        assert len(concentracao.buscar()) > 50  # agregado completo dos CSVs (~96 linhas)
+    finally:
+        concentracao._dados.cache_clear()
+
+
 def test_parquet_commitado_nao_esta_desatualizado():
     # guarda de FRESCOR: se o Parquet versionado divergir da agregação atual dos CSVs
     # (mudou regra ou mudou CSV sem re-rodar o ingest), o CI acusa aqui.

@@ -98,9 +98,12 @@ def _carregar() -> pd.DataFrame:
 
 @lru_cache(maxsize=1)
 def _dados() -> pd.DataFrame:
-    """Prefere o Parquet materializado pelo ingest; sem ele, agrega dos CSVs."""
+    """Prefere o Parquet materializado pelo ingest; sem ele (ou ilegível), agrega dos CSVs."""
     if PROCESSED_PARQUET.exists():
-        return pd.read_parquet(PROCESSED_PARQUET)
+        try:
+            return pd.read_parquet(PROCESSED_PARQUET)
+        except Exception:  # Parquet corrompido/incompatível não pode derrubar a API
+            pass
     return _carregar() if CONCENTRACAO_CSV.exists() else pd.DataFrame()
 
 
