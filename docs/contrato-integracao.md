@@ -2,8 +2,9 @@
 
 > Este é o documento **mais importante para o trabalho em paralelo**. Frontend e backend
 > só precisam concordar com este contrato; depois cada frente trabalha de forma independente.
-> Enquanto a IA real não está pronta, o backend devolve a resposta **mockada** neste mesmo
-> formato — então o frontend, o mapa e o PDF já funcionam.
+> A IA é **Gemini direto, sem mock** (ADR-014): sem `AI_API_KEY`, o backend responde um
+> "paper" de baixa confiança **neste mesmo formato** (fallback, sem 500) — então o frontend,
+> o mapa e o PDF funcionam mesmo sem a chave.
 
 Base URL local: `http://localhost:8000`
 

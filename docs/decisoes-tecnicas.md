@@ -216,6 +216,7 @@ Convenções:
 adicionar estados e garante que todos os componentes consumam os mesmos tokens (identidade visual única).
 
 **Trade-off:** mais arquivos por componente. Aceito — paga em legibilidade e consistência.
+Já aplicado em `IconButton`, `NavItem`, `TabNav`, `KpiCard`.
 
 ---
 
@@ -237,27 +238,14 @@ devolve `[]` (sem dados falsos) até o Parquet existir. A robustez fica num **tr
 
 **Trade-off:** não dá mais pra demonstrar sem a chave do Gemini. Aceito — a chave é simples de
 obter e o fallback evita travar a tela.
-Já aplicado em `IconButton`, `NavItem`, `TabNav`, `KpiCard`.
 
 ---
 
-## ADR-014 — Fonte Inter via @fontsource (self-host)
-**Data:** 2026-06-25 · **Status:** Aceito
+> **ADR-015 · ADR-016 · ADR-017 — i18n** (biblioteca react-i18next, estrutura de traduções,
+> mocks e conteúdo dinâmico): vivem em [i18n.md](./i18n.md).
+> **ADR-019 — Fonte Inter** fica no fim deste arquivo (renumerado — era um segundo ADR-014).
 
-**Contexto:** o DS usa **Inter** como família única. Opções: Google Fonts via `<link>` (CDN) ou
-self-host. O app será PWA (ADR-009), que precisa funcionar offline.
-
-**Decisão:** self-host com **`@fontsource-variable/inter`** (fonte variável, pesos 400–700 num só
-arquivo), importado em `src/main.tsx`. Sem Poppins/`font-display` — Inter para tudo.
-
-**Motivos:** funciona offline (alinha com PWA), sem dependência de CDN externo; os `.woff2` entram
-no `dist/` no build (hash/cache). Fonte variável = todos os pesos com um arquivo.
-
-**Pegadinhas (custaram debugging):**
-- O pacote registra a família como **`"Inter Variable"`** (não `"Inter"`). O `--font-sans` precisa
-  começar com `"Inter Variable"`, senão renderiza em `system-ui` silenciosamente.
-- O import side-effect precisa de **`declare module "@fontsource-variable/inter"`** em
-  `src/vite-env.d.ts`, senão o **`tsc -b`** do `npm run build` quebra (o `dev` não pega).
+---
 
 ## ADR-018 — Export de PDF: @react-pdf/renderer (Blob) + entrega por ambiente (PWA-safe)
 **Data:** 2026-07-01 · **Status:** Aceito · **Revisado:** 2026-07-01 (2×: ver Contexto)
@@ -297,3 +285,23 @@ iframe do react-to-print); mobile mantém o share sheet.
   depois** da aba carregar (revogar cedo cancela o carregamento).
 - Descartados: **html2canvas/html2pdf** (vira imagem, texto não selecionável); **react-to-print** (quebra no
   iOS PWA e bloqueia no desktop pelo copy-CSS+gesto).
+
+---
+
+## ADR-019 — Fonte Inter via @fontsource (self-host)
+**Data:** 2026-06-25 · **Status:** Aceito (renumerado em 2026-07-06 — era um segundo ADR-014, duplicado)
+
+**Contexto:** o DS usa **Inter** como família única. Opções: Google Fonts via `<link>` (CDN) ou
+self-host. O app será PWA (ADR-009), que precisa funcionar offline.
+
+**Decisão:** self-host com **`@fontsource-variable/inter`** (fonte variável, pesos 400–700 num só
+arquivo), importado em `src/main.tsx`. Sem Poppins/`font-display` — Inter para tudo.
+
+**Motivos:** funciona offline (alinha com PWA), sem dependência de CDN externo; os `.woff2` entram
+no `dist/` no build (hash/cache). Fonte variável = todos os pesos com um arquivo.
+
+**Pegadinhas (custaram debugging):**
+- O pacote registra a família como **`"Inter Variable"`** (não `"Inter"`). O `--font-sans` precisa
+  começar com `"Inter Variable"`, senão renderiza em `system-ui` silenciosamente.
+- O import side-effect precisa de **`declare module "@fontsource-variable/inter"`** em
+  `src/vite-env.d.ts`, senão o **`tsc -b`** do `npm run build` quebra (o `dev` não pega).

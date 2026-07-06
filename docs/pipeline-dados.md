@@ -10,6 +10,12 @@ Frente responsável: **Dados/Pipeline (frente 1)**.
 > roda **uma vez** (offline/no startup), produz dados limpos, e o `data_service` filtra
 > esses dados a cada pergunta. Ver [agente-ia.md](./agente-ia.md) e [dados-visent.md](./dados-visent.md).
 
+> ⚠️ **Status (2026-07-06):** o `scripts/ingest.py` **ainda não existe**. Hoje o `data_service`
+> (`app/services/dados/`) lê os CSVs direto de `backend/dataset/` no startup e agrega em memória
+> com as regras validadas da Etapa 3 abaixo (fonte da verdade: `app/services/dados/concentracao.py`).
+> Este documento segue como desenho do upgrade CSV → Parquet: quando o ingest existir,
+> troca-se só o `_carregar()` do data service.
+
 ## Visão geral (ETL)
 
 ```
@@ -96,28 +102,43 @@ drop_pct_medio, lat, lon`.
 
 O `tensor_concentracao` **já tem lat/lon, cluster e município** → **não precisa juntar com
 `antenas_flp`**. A "cobertura de rede" vem dos proxies de qualidade do próprio arquivo
-(`congestionamento_medio`, `drop_pct_medio`). Opcionalmente, cruzamos com a **renda** (`assinantes`):
+(`congestionamento_medio`, `drop_pct_medio`). Cruzamos também com a **renda** (`assinantes`).
+
+⚠️ **A forma de agregar importa** — o CSV é por `(antena, dia, período)` e um cluster tem
+várias antenas (mediana 6, até 13). Regras **validadas no dado real** (implementadas em
+`app/services/dados/concentracao.py` — fonte da verdade):
 
 ```python
-# concentração agregada por cluster/período (média dos 15 dias)
-agregado = (
-    conc.groupby(["municipio", "cluster", "periodo"], as_index=False)
-        .agg(concentracao=("n_usuarios", "mean"),
-             congestionamento=("congestionamento_medio", "mean"),
-             drop_rede=("drop_pct_medio", "mean"),
-             lat=("lat", "first"), lon=("lon", "first"))
-)
+ZONA = ["municipio", "cluster", "periodo"]
 
-# faixa de renda predominante por cluster (dado REAL de desigualdade)
-renda = (assinantes.groupby("home_cluster")["income_cluster"]
-         .agg(lambda s: s.mode().iat[0]).rename("renda").reset_index())
-agregado = agregado.merge(renda, left_on="cluster", right_on="home_cluster", how="left")
+# 1) concentração da ZONA = SOMA entre antenas (por dia), depois média entre dias.
+#    ⚠️ mean(n_usuarios) puro dilui o cluster pelo nº de antenas e subestima
+#    zonas densas (ex. CBD Beira-Mar).
+por_dia = conc.groupby([*ZONA, "day_date"], as_index=False).agg(usuarios=("n_usuarios", "sum"))
+concentracao = por_dia.groupby(ZONA, as_index=False).agg(concentracao=("usuarios", "mean"))
+
+# 2) taxas de rede (congestionamento, drop_rede) = média PONDERADA por n_usuarios:
+#    soma(taxa × usuários) / soma(usuários). ⚠️ NÃO usar média simples —
+#    antena vazia não pesa igual a lotada.
+
+# 3) renda = renda_baixa_pct (% de assinantes nas faixas baixas C+D por cluster).
+#    ⚠️ NÃO usar mode() de income_cluster: 'C' é maioria em todo cluster →
+#    mode='C' constante, coluna inútil.
+share = assinantes.groupby("home_cluster")["income_cluster"].value_counts(normalize=True)
+renda = (share.unstack().fillna(0)
+              .assign(renda_baixa_pct=lambda d: ((d["C"] + d["D"]) * 100).round(1))
+              [["renda_baixa_pct"]].reset_index())
+
+# 4) join da renda por chave NORMALIZADA (sem acento) — os CSV divergem
+#    (SAO_JOSE_ROÇADO vs SAO_JOSE_ROCADO) e o merge exato perde a renda em silêncio.
 ```
 
-> Aqui nasce o insight-chave do desafio: **alta concentração + rede ruim (congestionamento/drop
-> alto) + baixa renda = prioridade** para infraestrutura antes de chegar o programa social.
-> Derivar `prioridade` (ex.: concentração no topo do quartil E `congestionamento > 0.6`
-> E `renda ∈ {C, D}` → "alta").
+> A ideia original era derivar uma `prioridade` (concentração alta E rede ruim E baixa renda).
+> ⚠️ **Validado no dado real: não funciona neste dataset** — `congestionamento`/`drop_rede` são
+> **quase uniformes** (~0,35 em todas as zonas) e a renda tem spread de só ~2 p.p. (ruidoso) →
+> não dá pra ranquear "rede ruim" nem "baixa renda" com segurança. A métrica que discrimina
+> zonas é a **concentração**; o `_SYSTEM` da IA instrui a tratar métrica quase uniforme como
+> diferença marginal + `nivel_confianca='baixa'`.
 
 ## Etapa 4 — Validação (qualidade)
 
@@ -127,7 +148,7 @@ Antes de carregar, checar:
 - No agregado: sem nulos em `concentracao`, `cluster` e `periodo`.
 - `lat/lon` dentro de um *bounding box* plausível de Florianópolis
   (aprox. lat -28.0 a -27.2, lon -48.8 a -48.3).
-- `renda` ∈ {A, B, C, D} (ou nulo, se algum cluster não casar com `assinantes`).
+- `renda_baixa_pct` entre 0 e 100 (ou nulo, se algum cluster não casar com `assinantes`).
 
 Falhou? O pipeline **para com erro claro** — melhor falhar no build do que servir lixo.
 
@@ -164,14 +185,11 @@ def carregar(nome: str) -> pd.DataFrame:
     return df
 
 def transformar(conc: pd.DataFrame, assinantes: pd.DataFrame) -> pd.DataFrame:
-    agregado = (conc.groupby(["municipio", "cluster", "periodo"], as_index=False)
-                    .agg(concentracao=("n_usuarios", "mean"),
-                         congestionamento=("congestionamento_medio", "mean"),
-                         drop_rede=("drop_pct_medio", "mean"),
-                         lat=("lat", "first"), lon=("lon", "first")))
-    renda = (assinantes.groupby("home_cluster")["income_cluster"]
-                .agg(lambda s: s.mode().iat[0]).rename("renda").reset_index())
-    return agregado.merge(renda, left_on="cluster", right_on="home_cluster", how="left")
+    """Mesmas regras de app/services/dados/concentracao.py (fonte da verdade — ver Etapa 3):
+    concentração = soma entre antenas → média entre dias; taxas ponderadas por n_usuarios;
+    renda = renda_baixa_pct (%C+D) com join por chave normalizada (sem acento).
+    Ideal: extrair/importar essas funções do data service em vez de duplicar a lógica."""
+    ...
 
 def validar(df: pd.DataFrame) -> None:
     assert df["concentracao"].notna().all(), "há linhas sem concentração"

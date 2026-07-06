@@ -1,8 +1,9 @@
 # 👥 Divisão de Tarefas — 6 frentes
 
 Time de 6 pessoas iniciantes. As frentes são **paralelas**: o que destrava o paralelismo é
-o [contrato-integracao.md](./contrato-integracao.md). Enquanto a IA real não existe, o
-backend devolve resposta **mockada** no formato do contrato — então todas as telas já funcionam.
+o [contrato-integracao.md](./contrato-integracao.md). (Este é o plano do Dia 1 — hoje a API
+já responde com dado real + Gemini, **sem mock**; ver ADR-014 em
+[decisoes-tecnicas.md](./decisoes-tecnicas.md).)
 
 ## Frentes
 
@@ -12,7 +13,7 @@ backend devolve resposta **mockada** no formato do contrato — então todas as 
 | 2 | **Backend / API** | Python, FastAPI, Pydantic | `/health`, `/mapa` e `/dados` com **mock** no formato do contrato | Conectar rotas ao `data_service` real |
 | 3 | **Agente de IA** | Python | `ai_service` (monta prompt) + `ai_gateway` (adapter) | Plugar o `GeminiGateway` (SDK google-genai) + `AI_API_KEY` |
 | 4 | **Mapa** | React, react-leaflet | `MapaRegioes` com Leaflet + 1 município de Floripa (estático) | Consumir `/mapa`; cores por indicador |
-| 5 | **Consulta / UI / PDF** | React, TS | `AIQueryBar` + card `ResultadoPaper` + responsivo | Consumir `/dados`; exportar PDF (react-to-print) |
+| 5 | **Consulta / UI / PDF** | React, TS | `AIQueryBar` + card `ResultadoPaper` + responsivo | Consumir `/dados`; exportar PDF (`@react-pdf/renderer` — ADR-018) |
 | 6 | **Infra / Deploy / Docs** | Render, Git | `render.yaml`, `.env.example`, CORS, README; conectar front↔back | Deploy contínuo; manter docs atualizadas |
 
 > Frentes 1–3 são Python (backend); 4–5 são React (frontend); 6 costura tudo.
@@ -35,8 +36,8 @@ backend devolve resposta **mockada** no formato do contrato — então todas as 
 
 ## Marcos (até o Demo Day 10/07/2026)
 
-- [ ] **Dia 1** — Setup + contrato + mock funcionando ponta a ponta
-- [ ] **Semana 1** — `/dados` e `/mapa` com dado real do Vísent; telas integradas
-- [ ] **Semana 2** — Deploy no Render; PDF; provedor de IA real plugado
+- [x] **Dia 1** — Setup + contrato + mock funcionando ponta a ponta
+- [x] **Semana 1** — `/dados` e `/mapa` com dado real do Vísent; telas integradas
+- [x] **Semana 2** — Deploy no Render; PDF; provedor de IA real plugado
 - [ ] **Semana 3** — Indicadores complementares + polish de UX
 - [ ] **Reta final** — Ensaio do pitch + manter serviço acordado para a demo
