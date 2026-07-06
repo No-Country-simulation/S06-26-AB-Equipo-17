@@ -36,11 +36,11 @@ decisões — hoje isso leva dias cruzando planilhas manualmente.
 |---|---|---|
 | Frontend | **React + Vite + TypeScript** (PWA via `vite-plugin-pwa`) | Popular, empregável, muito material |
 | Mapa | **Leaflet + OpenStreetMap** | Gratuito, sem chave de API |
-| Backend | **Python 3.11+ + FastAPI + Pydantic** | pandas facilita o pipeline; docs automáticas |
+| Backend | **Python 3.12 + FastAPI + Pydantic** | pandas facilita o pipeline; docs automáticas |
 | Dados | **pandas** (DataFrame em memória) | Read-only; poucos milhares de linhas |
-| IA | **Provider-agnostic** (Google Gemini) | Camada isolada e trocável por variável de ambiente |
+| IA | **Google Gemini** (`google-genai`, `gemini-3.5-flash`) | Gateway isolado no backend; sem mock — fallback de baixa confiança sem a chave (ADR-014) |
 | i18n | **react-i18next** (pt-BR / en / es) | Interface trilíngue, traduções bundladas (offline-friendly) |
-| PDF | **react-to-print** | Exporta o "paper" (afirmação + tabela de evidências + fontes) |
+| PDF | **@react-pdf/renderer** | Gera o "paper" como PDF (Blob) no cliente; entrega por ambiente (ADR-018) |
 | Deploy | **Render** (site estático + web service) | Free tier, monorepo via `render.yaml` |
 
 ## 🏗️ Arquitetura (princípio central)
@@ -53,7 +53,8 @@ decisões — hoje isso leva dias cruzando planilhas manualmente.
 
 O frontend **nunca** fala com a IA direto. A API **filtra os dados reais** e só então pede
 à IA que **redija** a resposta usando *apenas* esses dados (padrão **ancorado** → não inventa
-número). A camada de IA é trocável por variável de ambiente.
+número). A integração com o Gemini fica isolada num gateway (adapter) — plugar outro LLM
+mexe só aí.
 
 ## 📊 Dataset Vísent CDRView
 
@@ -61,9 +62,10 @@ Dados de mobilidade da rede móvel na **Região Metropolitana de Florianópolis*
 da Claro/Anatel, 27 clusters, 7 municípios, 200 mil assinantes, 15 dias. Usamos as **tabelas
 agregadas** (do `bases_hackathon_bit.zip`, ~3 MB compactado): `tensor_concentracao.csv`
 (7.920 linhas — concentração + qualidade de rede + lat/lon) e `assinantes.csv` (~10 MB, **faixa de
-renda real**, dimensão de desigualdade); `antenas_flp.csv` (132) é opcional. O pipeline reduz tudo
-a um Parquet de poucos KB. Os tensores crus (2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do
-repo). Indicadores sociais (emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
+renda real**, dimensão de desigualdade); `tensor_od.csv` (506 fluxos origem→destino) alimenta a
+camada de mobilidade e `antenas_flp.csv` (132) o cruzamento de monitoramento. O backend agrega
+tudo em memória no startup (o Parquet via `scripts/ingest.py` é upgrade futuro). Os tensores crus
+(2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do repo). Indicadores sociais (emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
 
 **Pipeline (ETL):** Extract (zip 3 MB) → Profiling → Transform (limpeza + cruzamento
 concentração × qualidade de rede × renda) → Validate → Load (Parquet). Preparado para receber
