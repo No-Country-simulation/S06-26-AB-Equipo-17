@@ -106,7 +106,8 @@ POST /api/v1/dados
 Grande Florianópolis: **132 ERBs reais** (coordenadas Anatel), 27 zonas (clusters), 7 municípios, 15 dias. Dados sintéticos sobre antenas reais.
 
 - Indicadores: concentração de pessoas (`n_usuarios`), qualidade de rede (proxies `congestionamento_medio`/`drop_pct_medio`), faixa de renda (`income_cluster`) e fluxos origem→destino.
-- Os CSVs agregados (~3 MB) ficam **commitados em `backend/dataset/`** (o deploy lê de lá); os tensores de GB são proibidos no repo (`.gitignore`).
+- Os CSVs agregados (~3 MB) ficam **commitados em `backend/dataset/`**; os tensores de GB são proibidos no repo (`.gitignore`).
+- **Pipeline de ingestão** (`python -m scripts.ingest`, de `backend/`): Extract → Profiling → Transform → Validate → Load — valida os dados e materializa `backend/dataset/processed/concentracao.parquet` (~9 kB, commitado). O backend **prefere o Parquet no startup** e cai pros CSVs se ele não existir. Detalhes: [`docs/pipeline-dados.md`](./docs/pipeline-dados.md)
 - Dicionário de colunas completo: [`docs/dados-visent.md`](./docs/dados-visent.md)
 
 Fonte: [github.com/wongola-bit/appbit](https://github.com/wongola-bit/appbit) (pasta `dataset-visent/`)

@@ -63,12 +63,14 @@ da Claro/Anatel, 27 clusters, 7 municípios, 200 mil assinantes, 15 dias. Usamos
 agregadas** (do `bases_hackathon_bit.zip`, ~3 MB compactado): `tensor_concentracao.csv`
 (7.920 linhas — concentração + qualidade de rede + lat/lon) e `assinantes.csv` (~10 MB, **faixa de
 renda real**, dimensão de desigualdade); `tensor_od.csv` (506 fluxos origem→destino) alimenta a
-camada de mobilidade e `antenas_flp.csv` (132) o cruzamento de monitoramento. O backend agrega
-tudo em memória no startup (o Parquet via `scripts/ingest.py` é upgrade futuro). Os tensores crus
-(2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do repo). Indicadores sociais (emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
+camada de mobilidade e `antenas_flp.csv` (132) o cruzamento de monitoramento. O pipeline de
+ingestão (`python -m scripts.ingest`) valida e materializa o agregado em Parquet
+(`dataset/processed/`), que o backend carrega no startup (sem ele, agrega dos CSVs). Os tensores
+crus (2,7 GB / 915 MB) **não são usados** no MVP (ficam fora do repo). Indicadores sociais (emprego/formação/saúde mental) entram como **camadas complementares rotuladas**.
 
 **Pipeline (ETL):** Extract (zip 3 MB) → Profiling → Transform (limpeza + cruzamento
-concentração × qualidade de rede × renda) → Validate → Load (Parquet). Preparado para receber
+concentração × qualidade de rede × renda) → Validate → Load (Parquet) — **implementado em
+`backend/scripts/ingest.py`** (`python -m scripts.ingest`). Preparado para receber
 mais fontes (IBGE, DATASUS) sem refatorar.
 
 ## 🚀 Deploy
