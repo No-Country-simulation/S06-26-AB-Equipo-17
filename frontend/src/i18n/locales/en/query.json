@@ -1,6 +1,6 @@
 {
   "input": {
-    "title": "Natural language query",
+    "title": "How can I help you?",
     "description": "Ask as you would ask a technical advisor",
     "poweredBy": "Powered by Vísent CDRView + AI",
     "placeholder": "E.g.: Where are tech education programs missing in the metropolitan area?",
