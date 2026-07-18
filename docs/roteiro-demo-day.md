@@ -174,3 +174,70 @@ reserva (~12 s) = até ~32 s sem silêncio no palco.
 - [ ] Fechar abas/notificações do navegador; modo não perturbe no laptop e no celular.
 
 ---
+
+## Apêndice técnico — Arquitetura e Ingestão (Q&A / slide de apoio)
+
+> **Não entra no pitch falado** (o orçamento de 554 palavras já está no limite). É a cola para as
+> perguntas técnicas dos jurados e, se quiser, vira um slide de apoio deixado pronto no deck (não
+> apresentado — só aberto se perguntarem). Fonte da verdade: `skills/backend.md`, `skills/frontend.md`
+> e `docs/pipeline-dados.md`.
+
+### Backend — camadas + ports & adapters
+
+```
+endpoint (FastAPI /api/v1) → services/dados → services/ia → gateways → Gemini
+```
+
+- **Camadas com dependência apontando para dentro**: `api/` (HTTP + injeção) → `schemas/` (contrato
+  Pydantic) → `services/` (domínio) → `gateways/` (mundo externo).
+- **A IA é um adapter trocável**: `ai_gateway.py` define o `Protocol` + factory; `gemini_gateway.py`
+  é a implementação. Quem monta o prompt e valida a resposta é o `ai_service` — o gateway só chama.
+  Trocar Gemini por outro provedor = trocar 1 arquivo.
+- **Sem banco no MVP**: os dados do Vísent são agregados em memória (pandas) no startup, a partir
+  de um Parquet validado (ver ingestão abaixo). Sem `AI_API_KEY` a API degrada com elegância
+  (paper de confiança baixa, nunca 500).
+- **Resposta anti-alucinação por construção**: structured output do Gemini
+  (`response_schema=RespostaPaper`) + prompt `_SYSTEM` que obriga a copiar valores dos dados,
+  declarar proxy e rebaixar a confiança em métrica quase uniforme.
+
+**Frase pronta (se perguntarem "por que confiar na IA?"):** "O frontend nunca fala com a IA. O
+backend filtra os dados, manda com formato obrigatório, valida a resposta e, se os dados não
+bastam, a própria IA é instruída a dizer isso e rebaixar a confiança."
+
+### Frontend — feature-based + camada de dados isolada
+
+```
+página → hook (api/hooks) → endpoint (api/endpoints.ts) → client (api/client.ts) → HTTP
+```
+
+- **Só `api/` fala HTTP**: 1 arquivo conhece o axios (`client.ts`), 1 função tipada por endpoint
+  (mapeia DTO PT→EN); trocar a lib de HTTP = 1 arquivo.
+- **Features autocontidas** (`query-flow`, `notifications`, `settings`, `pwa-install`): um hook
+  orquestrador segura o estado; os componentes de tela são presentacionais (recebem tudo por props).
+- **Design system próprio** (Tailwind v4 CSS-first, tokens do design) + shadcn/ui só nos
+  interativos complexos; mapa Leaflet com 3 camadas de dado reais, **lazy por filtro**.
+- **PWA instalável** + i18n em 3 idiomas + PDF gerado no cliente (`@react-pdf`, PWA-safe).
+
+**Simetria que vale citar:** os dois lados isolam o mundo externo num único ponto trocável — no
+backend o gateway (Gemini), no front o `client.ts` (axios).
+
+### Pipeline de ingestão (`python -m scripts.ingest`)
+
+Requisito do MVP, entregue como ETL de 5 etapas que **falha alto em vez de servir lixo** (qualquer
+checagem reprovada aborta o build):
+
+| Etapa | O que faz |
+|---|---|
+| **Extract** | Confere os CSVs crus do Vísent em `dataset/` |
+| **Profiling** | Sanidade dos brutos: volumes mínimos, períodos válidos, sem nulos críticos |
+| **Transform** | **Importa** a agregação do data_service (fonte única, zero duplicação): concentração = soma entre antenas → média entre dias; taxas ponderadas por usuários; join de renda normalizado |
+| **Validate** | Qualidade do agregado: sem duplicata zona×período, lat/lon dentro da Grande Floripa, renda 0–100, join de renda cobrindo >90% das zonas |
+| **Load** | Grava `dataset/processed/concentracao.parquet` (~9 kB), que a API prefere no startup |
+
+- **Frescor garantido no CI**: `tests/test_ingest.py` acusa Parquet desatualizado se alguém mudar
+  regra/CSV e esquecer de re-rodar o ingest.
+- **Frase pronta (se perguntarem "e a qualidade dos dados?"):** "A ingestão valida antes de servir:
+  se uma checagem falha — coordenada fora da cidade, join de renda perdendo zonas — o pipeline para
+  no build. O dado que chega à IA já passou por esse funil, e o CI acusa se ele envelhecer."
+
+---
