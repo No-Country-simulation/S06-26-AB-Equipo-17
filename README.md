@@ -14,19 +14,28 @@ Gestores públicos não têm acesso fácil a dados cruzados por região para bas
 Nossa solução é uma Web App responsiva (PWA) com agente de IA que responde consultas em linguagem natural sobre o dataset **Vísent CDRView** (Grande Florianópolis): **concentração de pessoas × qualidade de rede × faixa de renda** por zona, mais **fluxos de mobilidade** origem→destino — tudo dado real, com resposta em formato de "paper" (afirmação + evidências + fontes + nível de confiança).
 
 ---
-## Acesso a aplicação
+## 🌐 Acesso à aplicação
 
 A aplicação está disponível em:  
 [https://appbit-web.onrender.com/](https://appbit-web.onrender.com/)  
 [https://appbit-api.onrender.com/](https://appbit-api.onrender.com/)
 
-## Demo PWA
-![Demo PWA](screenshots/mobile-demo.gif)
+## 📱 Demo PWA
 
-## Screenshots
+<img src="screenshots/mobile-demo.gif" width="300" alt="Demo PWA">
+
+*Demonstração da aplicação rodando como PWA no celular*
+
+## 🖥️ Screenshots
+
 ![Onboarding](screenshots/desktop-onboarding.png)
+*Onboarding — apresentação da plataforma*
+
 ![Home](screenshots/desktop-home.png)
+*Home — mapa temático da Grande Florianópolis*
+
 ![IA](screenshots/desktop-prompt.png)
+*Agente de IA — consulta em linguagem natural com resposta em formato de paper*
 
 ## 🛠️ Stack
 
