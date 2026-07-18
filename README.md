@@ -14,6 +14,19 @@ Gestores públicos não têm acesso fácil a dados cruzados por região para bas
 Nossa solução é uma Web App responsiva (PWA) com agente de IA que responde consultas em linguagem natural sobre o dataset **Vísent CDRView** (Grande Florianópolis): **concentração de pessoas × qualidade de rede × faixa de renda** por zona, mais **fluxos de mobilidade** origem→destino — tudo dado real, com resposta em formato de "paper" (afirmação + evidências + fontes + nível de confiança).
 
 ---
+## Acesso a aplicação
+
+A aplicação está disponível em:  
+[https://appbit-web.onrender.com/](https://appbit-web.onrender.com/)  
+[https://appbit-api.onrender.com/](https://appbit-api.onrender.com/)
+
+## Demo PWA
+![Demo PWA](screenshots/mobile-demo.gif)
+
+## Screenshots
+![Onboarding](screenshots/desktop-onboarding.png)
+![Home](screenshots/desktop-home.png)
+![IA](screenshots/desktop-prompt.png)
 
 ## 🛠️ Stack
 
@@ -164,6 +177,7 @@ Guia completo: [`docs/deploy.md`](./docs/deploy.md)
 
 ## 🔗 Links úteis
 
+- Design system: [appbit-web.onrender.com](https://appbit-web.onrender.com/)
 - Discord do hackathon: [discord.gg/7gBYpXCh3j](https://discord.gg/7gBYpXCh3j)
 - Brief completo: [github.com/wongola-bit/appbit-hackathon](https://github.com/wongola-bit/appbit-hackathon)
 - Dataset Vísent: [github.com/wongola-bit/appbit](https://github.com/wongola-bit/appbit)
