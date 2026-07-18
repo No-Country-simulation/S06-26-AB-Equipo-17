@@ -190,7 +190,7 @@ Guia completo: [`docs/deploy.md`](./docs/deploy.md)
 
 ## 🔗 Links úteis
 
-- Design system: [appbit-web.onrender.com](https://appbit-web.onrender.com/)
+- Design system: [Figma](https://www.figma.com/design/nohbwrvbhVZ1vfOtT3wWwJ/App-Bit---Hackathon?node-id=13-10&t=RSNyky9I48PDEyN7-1)
 - Discord do hackathon: [discord.gg/7gBYpXCh3j](https://discord.gg/7gBYpXCh3j)
 - Brief completo: [github.com/wongola-bit/appbit-hackathon](https://github.com/wongola-bit/appbit-hackathon)
 - Dataset Vísent: [github.com/wongola-bit/appbit](https://github.com/wongola-bit/appbit)
