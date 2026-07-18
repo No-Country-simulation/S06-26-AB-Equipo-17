@@ -16,8 +16,12 @@ Nossa solução é uma Web App responsiva (PWA) com agente de IA que responde co
 ---
 ## 🌐 Acesso à aplicação
 
-A aplicação está disponível em:  
+A aplicação está disponível em:
+
+### Frontend
 [https://appbit-web.onrender.com/](https://appbit-web.onrender.com/)  
+
+### Backend
 [https://appbit-api.onrender.com/](https://appbit-api.onrender.com/)
 
 ## 📱 Demo PWA
