@@ -30,8 +30,10 @@ class AIService:
         try:
             bruto = self._gateway.gerar(contexto, system=system, response_schema=RespostaPaper)
             return RespostaPaper.model_validate_json(bruto)
-        except Exception:  # noqa: BLE001 — fallback amplo de propósito (IA é externa)
-            logger.exception("Falha ao gerar/validar a resposta da IA")
+        except Exception as e:  # noqa: BLE001 — fallback amplo de propósito (IA é externa)
+            logger.exception(
+                "Falha ao gerar/validar a resposta da IA (%s: %s)", type(e).__name__, e
+            )
             return RespostaPaper(
                 afirmacao="Não foi possível gerar a resposta agora (IA indisponível). Tente novamente.",
                 nivel_confianca="baixa",

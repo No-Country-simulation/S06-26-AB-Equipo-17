@@ -4,4 +4,4 @@ pydantic
 pydantic-settings
 pandas
 pyarrow
-google-genai
+google-genai==2.30.1
