@@ -11,11 +11,11 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
 }
 
 export const styles = {
-  /** Ponto — dimensões vêm do tamanho e a cor do tom (states.ts). O anel
+  /** Ponto — dimensões e espessura do anel vêm do tamanho e a cor do tom (states.ts). O anel
    *  branco separa o pin do fundo; a sombra dá relevo sobre o mapa. */
   pin: cx(
     "inline-flex items-center justify-center rounded-full text-ink-inverse",
-    "ring-2 ring-white shadow-elev-2 transition-transform",
+    "ring-white shadow-elev-2 transition-transform",
     "hover:scale-110 outline-none focus-visible:ring-2 focus-visible:ring-primary",
   ),
   /** Marca o ponto selecionado — anel um pouco mais destacado. */

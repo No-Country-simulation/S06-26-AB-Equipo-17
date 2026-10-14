@@ -8,7 +8,7 @@ import type { FeatureCollection } from "geojson";
 import { AIPrompt } from "../../components/AIPrompt";
 import { MapFilterBar, type MapFilterItem } from "../../components/MapFilterBar";
 import { Legend } from "../../components/Legend";
-import { MapPin } from "../../components/MapPin";
+import { MapPin, mapPinSizePx } from "../../components/MapPin";
 import { RegionKpiCard } from "../../components/RegionKpiCard";
 import { QueryFlowModal } from "../../features/query-flow";
 import { useMapNetwork, useMapMobility, useMapOverview } from "../../api/hooks";
@@ -63,6 +63,10 @@ const MOBILITY_COLOR = "#2f6bff";
 /** Raio das bolhas (px): mín. + √(viagens/máx) → área ∝ viagens (proporcional). */
 const BUBBLE_MIN_RADIUS = 10;
 const BUBBLE_MAX_RADIUS = 44;
+
+/** Tamanho dos pins de bairro/zona — `xs` (14px) para não poluir o mapa. */
+const PIN_SIZE = "xs";
+const PIN_PX = mapPinSizePx[PIN_SIZE];
 
 /** Congestionamento vem como taxa 0–1 → exibir como percentual ("35%"). */
 function formatCongestion(value: number, locale: string): string {
@@ -149,13 +153,13 @@ export function MapPage() {
         className: "coverage-pin",
         html: renderToStaticMarkup(
           <MapPin
-            size="sm"
+            size={PIN_SIZE}
             tone={zone.noData ? "critical" : "info"}
             label={`${t(zone.noData ? "coverage.noDataLabel" : "coverage.pinLabel")}: ${zone.label}`}
           />,
         ),
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
+        iconSize: [PIN_PX, PIN_PX],
+        iconAnchor: [PIN_PX / 2, PIN_PX / 2],
       }),
     }));
   }, [networkData, t]);
@@ -204,10 +208,10 @@ export function MapPage() {
         icon: L.divIcon({
           className: "overview-pin",
           html: renderToStaticMarkup(
-            <MapPin size="sm" tone={monitored ? "info" : "critical"} label={statusLabel} />,
+            <MapPin size={PIN_SIZE} tone={monitored ? "info" : "critical"} label={statusLabel} />,
           ),
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+          iconSize: [PIN_PX, PIN_PX],
+          iconAnchor: [PIN_PX / 2, PIN_PX / 2],
         }),
       };
     });

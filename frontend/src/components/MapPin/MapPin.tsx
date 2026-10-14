@@ -5,7 +5,7 @@ import { sizeStyles, toneStyles, type MapPinSize, type MapPinTone } from "./MapP
 export type MapPinProps = {
   /** Tom do ponto (cor) — espelha a legenda do mapa. Default "info". */
   tone?: MapPinTone;
-  /** Tamanho do círculo: `sm` (32) p/ camadas densas ou `md` (56, DS). */
+  /** Tamanho do círculo: `xs` (14) p/ o mapa, `sm` (32) ou `md` (56, DS). */
   size?: MapPinSize;
   /** Rótulo acessível (aria-label). */
   label: string;
